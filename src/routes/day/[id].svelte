@@ -1,0 +1,210 @@
+<script lang="ts">
+	/**
+	 this version looks up each individual widget instead of using the widgets recordset
+	*/
+	import { params, goto } from '@roxi/routify'
+	import { chevronBackOutline, createOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionicons/icons'
+	import { alert, showConfirm } from "$services/alert";
+	import SupabaseDataService from '$services/supabase.data.service'
+	const supabaseDataService = SupabaseDataService.getInstance()
+	import SupabaseAuthService from '$services/supabase.auth.service'
+	import type { User } from '@supabase/supabase-js';
+
+	import { onDestroy, onMount } from 'svelte';
+
+	let user = null;
+  	let userSubscription: any;
+
+	let id = $params.id
+	let mode = 'view'
+
+	let day: any = {}; // = cache || {}
+	console.log('*** id', id);
+	let recordset: any;
+
+	if (id === 'new') {
+		console.log('it is new');
+			day = {
+				id: supabaseDataService.gen_random_uuid(),
+				user_id: user?.id || null,
+				created_at: new Date().toISOString(),
+				date: new Date().toISOString().substring(0,10),
+				food_log: {},
+				activity_log: {},
+				water_log: {},
+				weight: 0,
+				notes: '',
+			};
+			mode = 'edit'
+			console.log('*** new day', day);
+		} else {
+			recordset = supabaseDataService.getDataSubscription('day',{id}).subscribe((rec) => {
+				day = rec;
+				console.log('*** day', day);
+			})
+		}
+
+
+	onMount(() => {
+    userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
+      user = newuser;
+      // console.log('got user:', user)
+    	})
+  	})
+
+	onDestroy(() => {
+		recordset.unsubscribe()
+		userSubscription.unsubscribe()
+	})
+
+	const handler = (event) => {
+		if (typeof day[event.target.name] === 'number') {
+			try {
+				day[event.target.name] = parseFloat(event.target.value)
+			} catch (e) {
+				day[event.target.name] = 0
+			}
+		} else {
+			// string or object
+			day[event.target.name] = event.target.value
+		}
+	}
+	const save = async () => {
+		
+		// validate here...
+		if (!day.user_id) {
+			day.user_id = user.id
+		}
+
+		const { error } = await supabaseDataService.save_day(day)
+		if (error) {
+			console.error('save day error', error)
+		} else {
+			id = day.id;
+			mode = 'view';
+			supabaseDataService.updateDataSubscription('day',{id});
+		}
+	}
+	const delete_day = async () => {
+		await showConfirm({
+			header: "Delete Day",
+			message: "Are you sure?", 
+			okHander: async () => {
+				const { data, error } = await supabaseDataService.delete_day(day)
+				if (error) {
+					console.error("Error deleting day", error)
+				} else {
+					goBack()
+					// window.location.href = '/days'
+				}
+			}
+		});
+	}
+	const goBack = () => {
+		$goto(`/days`)
+	}
+</script>
+
+<ion-header translucent="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-button
+				on:click={() => {
+					//history.back()
+					// window.location.href = '/days'
+					goBack();
+				}}
+			>
+				<ion-icon slot="icon-only" icon={chevronBackOutline} />
+			</ion-button>
+		</ion-buttons>
+		<ion-title>Day</ion-title>
+		<ion-buttons slot="end">
+			{#if mode === 'view'}
+				<ion-button
+					on:click={delete_day}
+				>
+					<ion-icon slot="icon-only" icon={trashOutline} />
+				</ion-button>
+				<ion-button
+					on:click={() => {
+						mode = 'edit'
+					}}
+				>
+					<ion-icon slot="icon-only" icon={createOutline} />
+				</ion-button>
+			{/if}
+			{#if mode === 'edit'}
+				<ion-button
+					on:click={() => {
+						mode = 'view'
+						if (id === 'add') goBack() // window.location.href = '/TestData';
+						// else day = cache || {}
+					}}
+				>
+					<ion-icon slot="icon-only" icon={closeOutline} />
+				</ion-button>
+				<ion-button
+					on:click={() => {
+						save()
+					}}
+				>
+					<ion-icon slot="icon-only" icon={checkmarkOutline} />
+				</ion-button>
+			{/if}
+		</ion-buttons>
+	</ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+	{#if day}
+		<ion-card>
+			<ion-card-header>
+				<ion-card-subtitle>{day?.id}</ion-card-subtitle>
+				<ion-card-title>
+					{#if mode === 'view'}{day?.date}{/if}
+					{#if mode === 'edit'}
+						<ion-label>Date:</ion-label><ion-input
+							value={day.date}
+							on:ionChange={handler}
+							required
+							name="date"
+							type="text"
+						/>
+					{/if}
+				</ion-card-title>
+			</ion-card-header>
+
+			<ion-card-content>
+				{#if mode === 'view'}{day?.notes}{/if}
+				{#if mode === 'edit'}
+					<ion-label>Notes:</ion-label><ion-input
+						value={day.notes}
+						on:ionChange={handler}
+						required
+						name="notes"
+						type="text"
+					/>
+				{/if}
+				<br />
+				<br />
+				<br />
+				created: {new Date(day?.created_at).toLocaleDateString()} {new Date(day?.created_at).toLocaleTimeString()}<br/>
+				<br />
+			</ion-card-content>
+		</ion-card>
+	{/if}
+</ion-content>
+
+<style>
+	ion-label {
+		display: inline-block;
+		width: 40%;
+		text-align: right;
+		padding-right: 10px;
+	}
+	ion-input {
+		width: 60%;
+		border: 1px solid;
+		display: inline-block;
+	}
+</style>
