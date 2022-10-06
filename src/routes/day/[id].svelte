@@ -11,6 +11,9 @@
 		trashOutline,
 		addCircleOutline,
 	} from 'ionicons/icons'
+	import { modalController } from '$ionic/svelte'
+	import FoodEntryModal from './FoodEntryModal.svelte'
+
 	import { alert, showConfirm } from '$services/alert'
 	import SupabaseDataService from '$services/supabase.data.service'
 	const supabaseDataService = SupabaseDataService.getInstance()
@@ -114,12 +117,14 @@
 		}
 		day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
 		day.food_log.entries[day.food_log.entries.length - 1].food_id = ''
-		day.food_log.entries[day.food_log.entries.length - 1].name = ''
+		day.food_log.entries[day.food_log.entries.length - 1].title = ''
 		day.food_log.entries[day.food_log.entries.length - 1].desc = ''
 		day.food_log.entries[day.food_log.entries.length - 1].cat = ''
 		day.food_log.entries[day.food_log.entries.length - 1].cps = 0 // cost per serving
 		day.food_log.entries[day.food_log.entries.length - 1].qty = 1 // servings
 		day.food_log.entries[day.food_log.entries.length - 1].amt = 0
+
+		openFoodEntryBox(day.food_log.entries[day.food_log.entries.length - 1], day.food_log.entries.length - 1);
 	}
 	const edit_food_log_entry = (id) => {
 		console.log('edit_new_food_log_entry: not implemented yet')
@@ -132,6 +137,26 @@
 			day.food_log.entries.splice(to, 0, item)
 			detail.complete()
 	};
+
+
+	const openFoodEntryBox = async (entry: any, index: number) => {
+		const openFodEntryModalController = await modalController.create({
+			component: FoodEntryModal,
+			componentProps: {
+				entry: entry,
+			},
+			showBackdrop: true,
+			backdropDismiss: true,
+		})
+
+		await openFodEntryModalController.present()
+		const { data } = await openFodEntryModalController.onWillDismiss();
+		if (data !== null) {
+			day.food_log.entries[index] = data.data;
+			console.log('*** day.food_log.entries', day.food_log.entries)
+		}		
+	}
+
 </script>
 
 <ion-header translucent="true">
@@ -224,10 +249,10 @@
 									on:click={() => {
 										edit_food_log_entry(entry?.id)
 									}}>
-									{JSON.stringify(entry)}
+									{entry?.title}
 									<ion-note slot="end">
 										<!-- {day.food_total.toFixed(0)} -->
-										{entry?.amt.toFixed(0)}
+										{entry?.amt || 0}
 									</ion-note>
 									<ion-reorder slot="start" />
 								</ion-item>
