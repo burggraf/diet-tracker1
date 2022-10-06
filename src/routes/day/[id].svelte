@@ -3,54 +3,60 @@
 	 this version looks up each individual widget instead of using the widgets recordset
 	*/
 	import { params, goto } from '@roxi/routify'
-	import { chevronBackOutline, createOutline, checkmarkOutline, closeOutline, trashOutline, addCircleOutline } from 'ionicons/icons'
-	import { alert, showConfirm } from "$services/alert";
+	import {
+		chevronBackOutline,
+		createOutline,
+		checkmarkOutline,
+		closeOutline,
+		trashOutline,
+		addCircleOutline,
+	} from 'ionicons/icons'
+	import { alert, showConfirm } from '$services/alert'
 	import SupabaseDataService from '$services/supabase.data.service'
 	const supabaseDataService = SupabaseDataService.getInstance()
 	import SupabaseAuthService from '$services/supabase.auth.service'
-	import type { User } from '@supabase/supabase-js';
+	import type { User } from '@supabase/supabase-js'
 
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte'
 
-	let user = null;
-  	let userSubscription: any;
+	let user = null
+	let userSubscription: any
 
 	let id = $params.id
 	let mode = 'view'
 
-	let day: any = {}; // = cache || {}
-	console.log('*** id', id);
-	let recordset: any;
+	let day: any = {} // = cache || {}
+	console.log('*** id', id)
+	let recordset: any
 
 	if (id === 'new') {
-		console.log('it is new');
-			day = {
-				id: supabaseDataService.gen_random_uuid(),
-				user_id: user?.id || null,
-				created_at: new Date().toISOString(),
-				date: new Date().toISOString().substring(0,10),
-				food_log: {entries:[]},
-				activity_log: {entries:[]},
-				water_log: {entries:[]},
-				weight: 0,
-				notes: '',
-			};
-			mode = 'edit'
-			console.log('*** new day', day);
-		} else {
-			recordset = supabaseDataService.getDataSubscription('day',{id}).subscribe((rec) => {
-				day = rec;
-				console.log('*** day', day);
-			})
+		console.log('it is new')
+		day = {
+			id: supabaseDataService.gen_random_uuid(),
+			user_id: user?.id || null,
+			created_at: new Date().toISOString(),
+			date: new Date().toISOString().substring(0, 10),
+			food_log: { entries: [] },
+			activity_log: { entries: [] },
+			water_log: { entries: [] },
+			weight: 0,
+			notes: '',
 		}
-
+		mode = 'edit'
+		console.log('*** new day', day)
+	} else {
+		recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
+			day = rec
+			console.log('*** day', day)
+		})
+	}
 
 	onMount(() => {
-    userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
-      user = newuser;
-      //console.log('got user:', user)
-    	})
-  	})
+		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
+			user = newuser
+			//console.log('got user:', user)
+		})
+	})
 
 	onDestroy(() => {
 		recordset.unsubscribe()
@@ -70,7 +76,6 @@
 		}
 	}
 	const save = async () => {
-		
 		// validate here...
 		if (!day.user_id) {
 			day.user_id = user.id
@@ -80,45 +85,48 @@
 		if (error) {
 			console.error('save day error', error)
 		} else {
-			id = day.id;
-			mode = 'view';
-			supabaseDataService.updateDataSubscription('day',{id});
+			id = day.id
+			mode = 'view'
+			supabaseDataService.updateDataSubscription('day', { id })
 		}
 	}
 	const delete_day = async () => {
 		await showConfirm({
-			header: "Delete Day",
-			message: "Are you sure?", 
+			header: 'Delete Day',
+			message: 'Are you sure?',
 			okHander: async () => {
 				const { data, error } = await supabaseDataService.delete_day(day)
 				if (error) {
-					console.error("Error deleting day", error)
+					console.error('Error deleting day', error)
 				} else {
 					goBack()
 					// window.location.href = '/days'
 				}
-			}
-		});
+			},
+		})
 	}
 	const goBack = () => {
 		$goto(`/days`)
 	}
 	const add_food_log_entry = (id) => {
-		console.log('day.food_log.entries', day.food_log.entries)
 		if (!day.food_log.entries) {
 			day.food_log.entries = []
 		}
-		day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
-		//update the new entry
-		day.food_log.entries[day.food_log.entries.length-1].food_id = id
-		day.food_log.entries[day.food_log.entries.length-1].quantity = 1
-		//day.food_log.entries({id: supabaseDataService.gen_random_uuid(), food_id: id, quantity: 1})
-		console.log('day.food_log.entries', day.food_log.entries)
+		day.food_log.entries.push({ id: supabaseDataService.gen_random_uuid() })
+		day.food_log.entries[day.food_log.entries.length - 1].food_id = id
+		day.food_log.entries[day.food_log.entries.length - 1].quantity = 1
 	}
 	const edit_food_log_entry = (id) => {
-		console.log('edit_new_food_log_entry: not implemented yet');
+		console.log('edit_new_food_log_entry: not implemented yet')
 		//$goto(`/food_log_entry/${id}`)
 	}
+
+	const reorder_food_log = ({ detail }) => {
+			const { from, to } = detail
+			const item = day.food_log.entries.splice(from, 1)[0]
+			day.food_log.entries.splice(to, 0, item)
+			detail.complete()
+	};
 </script>
 
 <ion-header translucent="true">
@@ -128,7 +136,7 @@
 				on:click={() => {
 					//history.back()
 					// window.location.href = '/days'
-					goBack();
+					goBack()
 				}}
 			>
 				<ion-icon slot="icon-only" icon={chevronBackOutline} />
@@ -137,9 +145,7 @@
 		<ion-title>Day</ion-title>
 		<ion-buttons slot="end">
 			{#if mode === 'view'}
-				<ion-button
-					on:click={delete_day}
-				>
+				<ion-button on:click={delete_day}>
 					<ion-icon slot="icon-only" icon={trashOutline} />
 				</ion-button>
 				<ion-button
@@ -203,26 +209,37 @@
 				{/if}
 				<br />
 				<ion-list lines="full">
-					{#if day?.food_log?.entries}
-						{#each day?.food_log?.entries as entry}
-						<ion-item on:click={() => {edit_food_log_entry(entry?.id)}}>
-							{JSON.stringify(entry)}
-							<ion-note slot="end">
-								<!-- {day.food_total.toFixed(0)} -->
-								stuff
-							</ion-note>
-						</ion-item>
-						{/each}
-					{/if}
-					<ion-item on:click={() => {add_food_log_entry()}}>
-						<ion-icon icon={addCircleOutline} slot="start"></ion-icon>
+					<ion-reorder-group
+						id="food_log_group"
+						disabled="false"
+						on:ionItemReorder={reorder_food_log}>
+						{#if day?.food_log?.entries}
+							{#each day?.food_log?.entries as entry}
+								<ion-item
+									on:click={() => {
+										edit_food_log_entry(entry?.id)
+									}}>
+									{JSON.stringify(entry)}
+									<ion-note slot="end">
+										<!-- {day.food_total.toFixed(0)} -->
+										stuff
+									</ion-note>
+									<ion-reorder slot="start" />
+								</ion-item>
+							{/each}
+						{/if}
+					</ion-reorder-group>
+
+					<ion-item on:click={add_food_log_entry}>
+						<ion-icon icon={addCircleOutline} slot="start" />
 						add new entry
-					</ion-item>	
+					</ion-item>
 				</ion-list>
 
 				<br />
 				<br />
-				created: {new Date(day?.created_at).toLocaleDateString()} {new Date(day?.created_at).toLocaleTimeString()}<br/>
+				created: {new Date(day?.created_at).toLocaleDateString()}
+				{new Date(day?.created_at).toLocaleTimeString()}<br />
 				<br />
 			</ion-card-content>
 		</ion-card>
