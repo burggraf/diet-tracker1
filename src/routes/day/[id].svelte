@@ -62,8 +62,12 @@
 	})
 
 	onDestroy(() => {
-		recordset.unsubscribe()
-		userSubscription.unsubscribe()
+		try {
+			recordset.unsubscribe()
+			userSubscription.unsubscribe()
+		} catch (err) {
+			console.error('error unsubscribing', err)
+		}
 	})
 
 	const handler = (event) => {
@@ -88,7 +92,17 @@
 
 		const { error } = await supabaseDataService.save_day(day)
 		if (error) {
-			console.error('save day error', error)
+			console.log('error message is: ', error.message)
+			if (error.message.startsWith("duplicate key value violates unique constraint")) {
+      			console.log('DUPLICATE DAY');
+				alert({
+					header: 'Duplicate Day',
+ 				    //subHeader: '',
+				    message: 'This day already exists.  Please edit the existing day.',
+				})
+    		} else {
+				console.error('save day error', error)
+			}
 		} else {
 			id = day.id
 			mode = 'view'
@@ -125,18 +139,22 @@
 			cat: '',
 			cps: 0,
 			qty: 0,
-			amt: 0
+			amt: 0,
+			created: new Date().toISOString(),
 		}
 
 		const saved = await openFoodEntryBox(entry, day.food_log.entries.length);
 		console.log('done calling openFoodEntryBox', saved)
 		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
-		save();
+		save()
 	}
-	const edit_food_log_entry = (id) => {
-		console.log('edit_new_food_log_entry: not implemented yet')
-		//$goto(`/food_log_entry/${id}`)
+	const edit_food_log_entry = async (index) => {
+		const saved = await openFoodEntryBox(day.food_log.entries[index], index);
+		console.log('edit_food_log_entry is done calling openFoodEntryBox', saved)
+		console.log('day.food_log.entries', day.food_log.entries)
+		day.food_log.entries = [...day.food_log.entries]
+		save()
 	}
 
 	const reorder_food_log = ({ detail }) => {
@@ -257,10 +275,10 @@
 						disabled="false"
 						on:ionItemReorder={reorder_food_log}>
 						{#if day?.food_log?.entries}
-							{#each day?.food_log?.entries as entry}
+							{#each day?.food_log?.entries as entry, index}
 								<ion-item
 									on:click={() => {
-										edit_food_log_entry(entry?.id)
+										edit_food_log_entry(index)
 									}}>
 									{entry?.title}
 									<ion-note slot="end">

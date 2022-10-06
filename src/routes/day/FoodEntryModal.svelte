@@ -73,6 +73,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                         name="title"
                         class="formInputBoxWithIcon"
                         type="text" 
+                        value={entry.title}
                         placeholder="Title">
                         <ion-icon class="inputIcon" 
                           icon={mailOutline} 
