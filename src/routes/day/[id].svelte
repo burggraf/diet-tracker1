@@ -80,6 +80,8 @@
 	}
 	const save = async () => {
 		// validate here...
+		console.log('save the day', day)
+
 		if (!day.user_id) {
 			day.user_id = user.id
 		}
@@ -90,7 +92,7 @@
 		} else {
 			id = day.id
 			mode = 'view'
-			supabaseDataService.updateDataSubscription('day', { id })
+			// supabaseDataService.updateDataSubscription('day', { id })
 		}
 	}
 	const delete_day = async () => {
@@ -111,20 +113,26 @@
 	const goBack = () => {
 		$goto(`/days`)
 	}
-	const add_food_log_entry = (id) => {
+	const add_food_log_entry = async (id) => {
 		if (!day.food_log.entries) {
 			day.food_log.entries = []
 		}
-		day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
-		day.food_log.entries[day.food_log.entries.length - 1].food_id = ''
-		day.food_log.entries[day.food_log.entries.length - 1].title = ''
-		day.food_log.entries[day.food_log.entries.length - 1].desc = ''
-		day.food_log.entries[day.food_log.entries.length - 1].cat = ''
-		day.food_log.entries[day.food_log.entries.length - 1].cps = 0 // cost per serving
-		day.food_log.entries[day.food_log.entries.length - 1].qty = 1 // servings
-		day.food_log.entries[day.food_log.entries.length - 1].amt = 0
+		const entry = {
+			id: supabaseDataService.gen_random_uuid(),
+			food_id: '',
+			title: '',
+			desc: '',
+			cat: '',
+			cps: 0,
+			qty: 0,
+			amt: 0
+		}
 
-		openFoodEntryBox(day.food_log.entries[day.food_log.entries.length - 1], day.food_log.entries.length - 1);
+		const saved = await openFoodEntryBox(entry, day.food_log.entries.length);
+		console.log('done calling openFoodEntryBox', saved)
+		console.log('day.food_log.entries', day.food_log.entries)
+		day.food_log.entries = [...day.food_log.entries]
+		save();
 	}
 	const edit_food_log_entry = (id) => {
 		console.log('edit_new_food_log_entry: not implemented yet')
@@ -136,6 +144,8 @@
 			const item = day.food_log.entries.splice(from, 1)[0]
 			day.food_log.entries.splice(to, 0, item)
 			detail.complete()
+			console.log('reorder_food_log: day', day)
+			save()
 	};
 
 
@@ -151,10 +161,13 @@
 
 		await openFodEntryModalController.present()
 		const { data } = await openFodEntryModalController.onWillDismiss();
-		if (data !== null) {
+		if (data?.data !== null) {
 			day.food_log.entries[index] = data.data;
 			console.log('*** day.food_log.entries', day.food_log.entries)
-		}		
+			return true;
+		} else {
+			return false;
+		}	
 	}
 
 </script>

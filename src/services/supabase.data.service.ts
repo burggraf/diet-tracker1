@@ -220,9 +220,11 @@ export default class SupabaseDataService {
 
   public async saveRecord(table: string, record: any) {
     if (isOnline) {
+      console.log('saveRecord', table, record);
       const { data, error } = 
       await supabase.from(table)
       .upsert(record);
+      console.log('data', data, 'error', error);
       return { data, error };  
     } else {
       this.queueUpdate('saveRecord', table, record);
@@ -311,8 +313,8 @@ export default class SupabaseDataService {
   }
 
 
-  public async save_day(widget: any) {
-    const { data, error} = await this.saveRecord('days', widget);
+  public async save_day(day: any) {
+    const { data, error} = await this.saveRecord('days', day);
     return { data, error };
   }
   public async delete_day(record: any) {
