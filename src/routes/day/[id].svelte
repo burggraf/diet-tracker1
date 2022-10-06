@@ -112,9 +112,14 @@
 		if (!day.food_log.entries) {
 			day.food_log.entries = []
 		}
-		day.food_log.entries.push({ id: supabaseDataService.gen_random_uuid() })
-		day.food_log.entries[day.food_log.entries.length - 1].food_id = id
-		day.food_log.entries[day.food_log.entries.length - 1].quantity = 1
+		day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
+		day.food_log.entries[day.food_log.entries.length - 1].food_id = ''
+		day.food_log.entries[day.food_log.entries.length - 1].name = ''
+		day.food_log.entries[day.food_log.entries.length - 1].desc = ''
+		day.food_log.entries[day.food_log.entries.length - 1].cat = ''
+		day.food_log.entries[day.food_log.entries.length - 1].cps = 0 // cost per serving
+		day.food_log.entries[day.food_log.entries.length - 1].qty = 1 // servings
+		day.food_log.entries[day.food_log.entries.length - 1].amt = 0
 	}
 	const edit_food_log_entry = (id) => {
 		console.log('edit_new_food_log_entry: not implemented yet')
@@ -222,7 +227,7 @@
 									{JSON.stringify(entry)}
 									<ion-note slot="end">
 										<!-- {day.food_total.toFixed(0)} -->
-										stuff
+										{entry?.amt.toFixed(0)}
 									</ion-note>
 									<ion-reorder slot="start" />
 								</ion-item>
