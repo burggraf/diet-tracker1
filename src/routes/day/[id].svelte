@@ -3,7 +3,7 @@
 	 this version looks up each individual widget instead of using the widgets recordset
 	*/
 	import { params, goto } from '@roxi/routify'
-	import { chevronBackOutline, createOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionicons/icons'
+	import { chevronBackOutline, createOutline, checkmarkOutline, closeOutline, trashOutline, addCircleOutline } from 'ionicons/icons'
 	import { alert, showConfirm } from "$services/alert";
 	import SupabaseDataService from '$services/supabase.data.service'
 	const supabaseDataService = SupabaseDataService.getInstance()
@@ -29,9 +29,9 @@
 				user_id: user?.id || null,
 				created_at: new Date().toISOString(),
 				date: new Date().toISOString().substring(0,10),
-				food_log: {},
-				activity_log: {},
-				water_log: {},
+				food_log: {entries:[]},
+				activity_log: {entries:[]},
+				water_log: {entries:[]},
 				weight: 0,
 				notes: '',
 			};
@@ -48,7 +48,7 @@
 	onMount(() => {
     userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
       user = newuser;
-      // console.log('got user:', user)
+      //console.log('got user:', user)
     	})
   	})
 
@@ -102,6 +102,22 @@
 	}
 	const goBack = () => {
 		$goto(`/days`)
+	}
+	const add_food_log_entry = (id) => {
+		console.log('day.food_log.entries', day.food_log.entries)
+		if (!day.food_log.entries) {
+			day.food_log.entries = []
+		}
+		day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
+		//update the new entry
+		day.food_log.entries[day.food_log.entries.length-1].food_id = id
+		day.food_log.entries[day.food_log.entries.length-1].quantity = 1
+		//day.food_log.entries({id: supabaseDataService.gen_random_uuid(), food_id: id, quantity: 1})
+		console.log('day.food_log.entries', day.food_log.entries)
+	}
+	const edit_food_log_entry = (id) => {
+		console.log('edit_new_food_log_entry: not implemented yet');
+		//$goto(`/food_log_entry/${id}`)
 	}
 </script>
 
@@ -186,6 +202,24 @@
 					/>
 				{/if}
 				<br />
+				<ion-list lines="full">
+					{#if day?.food_log?.entries}
+						{#each day?.food_log?.entries as entry}
+						<ion-item on:click={() => {edit_food_log_entry(entry?.id)}}>
+							{JSON.stringify(entry)}
+							<ion-note slot="end">
+								<!-- {day.food_total.toFixed(0)} -->
+								stuff
+							</ion-note>
+						</ion-item>
+						{/each}
+					{/if}
+					<ion-item on:click={() => {add_food_log_entry()}}>
+						<ion-icon icon={addCircleOutline} slot="start"></ion-icon>
+						add new entry
+					</ion-item>	
+				</ion-list>
+
 				<br />
 				<br />
 				created: {new Date(day?.created_at).toLocaleDateString()} {new Date(day?.created_at).toLocaleTimeString()}<br/>
