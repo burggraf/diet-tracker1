@@ -179,8 +179,12 @@
 
 		await openFodEntryModalController.present()
 		const { data } = await openFodEntryModalController.onWillDismiss();
-		if (data?.data !== null) {
-			day.food_log.entries[index] = data.data;
+		if (data?.data !== null) {			
+			if (data.data.deleted) { // check for deleted entry...
+				day.food_log.entries.splice(index, 1)
+			} else {
+				day.food_log.entries[index] = data.data
+			}
 			console.log('*** day.food_log.entries', day.food_log.entries)
 			return true;
 		} else {

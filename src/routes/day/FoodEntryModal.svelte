@@ -13,6 +13,8 @@
       lockOpenOutline,
       lockClosedOutline,
       arrowForwardOutline,
+      trashOutline,
+      checkmarkOutline,
       link
     } from "ionicons/icons";
   import { saveConfig } from "@ionic/core"
@@ -27,6 +29,10 @@
     }
 
     function save() {
+        modalController.dismiss({ data: entry });
+    }
+    function deleteEntry() {
+        entry.deleted = true;
         modalController.dismiss({ data: entry });
     }
   
@@ -44,10 +50,18 @@
         icon={closeOutline} 
         slot="start" size="large" color="medium"></ion-icon>
       </ion-buttons>
+
+      <ion-buttons slot="end">
+        <ion-icon 
+        on:click={deleteEntry}
+        icon={trashOutline} 
+        slot="start" size="large" color="medium"></ion-icon>
+      </ion-buttons>
+
     </ion-toolbar>
   </ion-header>
   
-  entry: {JSON.stringify(entry)}
+  
 
 <!-- day.food_log.entries.push({id: supabaseDataService.gen_random_uuid()})
 day.food_log.entries[day.food_log.entries.length - 1].food_id = ''
@@ -87,18 +101,39 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
 
         <ion-row>
             <ion-col>
-                <div class="ion-text-center" style="margin-bottom:10px">
-                    <ion-label><b>or</b></ion-label>
-                </div>
+                <ion-label>Description</ion-label>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+  
+                <ion-item class="formItem" lines="none">
+                    <ion-textarea 
+                        on:ionChange={handleTextValue}
+                        name="desc"
+                        class="formTextarea"
+                        type="text" 
+                        value={entry.desc}
+                        placeholder="Description">
+                    </ion-textarea>
+  
+                </ion-item>
+  
+            </ion-col>
+        </ion-row>
+
+        <ion-row>
+            <ion-col>
                 <ion-button expand="block" 
                 disabled={false}
                 on:click={save}>
-                <ion-icon icon={link} size="large" />&nbsp;&nbsp;
+                <ion-icon icon={checkmarkOutline} size="large" />&nbsp;&nbsp;
                 <b>Done</b></ion-button>                    
             </ion-col>
         </ion-row>
     </ion-grid>    
-  
+    <pre>{JSON.stringify(entry,null,2)}</pre>
+
   <style>
   .Grid {
       max-width:375px;
@@ -126,6 +161,11 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
   }
   .formInputBoxWithIcon {
       height: 50px;
+      border: 1px solid rgb(212, 212, 212);
+      background-color: var(--ion-background-color) !important;
+      border-radius: 5px;
+  }
+  .formTextarea {
       border: 1px solid rgb(212, 212, 212);
       background-color: var(--ion-background-color) !important;
       border-radius: 5px;
