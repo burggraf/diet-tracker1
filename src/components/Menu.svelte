@@ -1,7 +1,7 @@
 <script lang="ts">
 	// import { IonicConfig } from '@ionic/core/components';
 	import { menuController, registerMenu } from '$ionic/svelte'
-	import { settings, person, informationCircle } from 'ionicons/icons'
+	import { settings, person, informationCircle, calendarOutline } from 'ionicons/icons'
 	import { onDestroy, onMount } from 'svelte'
 	import Login from '$components/Login/Login.svelte'
 	import SupabaseAuthService from '$services/supabase.auth.service'
@@ -37,8 +37,8 @@
 	})
 
 	const appPages = [
-		{ title: 'Current User', url: '/TestAuth', icon: person, requireLogin: true },
-		{ title: 'Widgets', url: '/widgets', icon: settings, requireLogin: false },
+		// { title: 'Current User', url: '/TestAuth', icon: person, requireLogin: true },
+		{ title: 'Days', url: '/days', icon: calendarOutline, requireLogin: false },
 		{ title: 'Info', url: '/', icon: informationCircle, requireLogin: false },
 	]
 	const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']

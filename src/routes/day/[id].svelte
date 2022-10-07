@@ -317,7 +317,7 @@
 			</ion-card-content>
 		</ion-card>
 	{/if}
-	<pre>{JSON.stringify(day,null,2)}</pre>
+	<!-- <pre>{JSON.stringify(day,null,2)}</pre> -->
 </ion-content>
 
 <style>

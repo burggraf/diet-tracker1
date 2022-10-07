@@ -9,6 +9,7 @@
     import {
       mailOutline,
       closeOutline,
+      fastFoodOutline,
       personAdd,
       lockOpenOutline,
       lockClosedOutline,
@@ -27,6 +28,10 @@
     function handleTextValue(event) {
         entry[event.target.name] = event.target.value!;
     }
+    function handleSegmentValue(event) {
+        entry[event.target.id] = event.target.value!;
+    }
+
     function handleNumberValue(event) {
         try {
             entry[event.target.name] = parseFloat(event.target.value!) || 0;
@@ -97,7 +102,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                         value={entry.title}
                         placeholder="Title">
                         <ion-icon class="inputIcon" 
-                          icon={mailOutline} 
+                          icon={fastFoodOutline} 
                           slot="start" size="large" color="medium"></ion-icon>
                     </ion-input>
                 </ion-item>
@@ -154,6 +159,46 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
             </ion-col>
         </ion-row>
 
+        <ion-row>
+            <ion-col>
+                <ion-label>Category</ion-label>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-item class="formItem" lines="none">
+
+                    <ion-segment value={entry.cat}
+                    on:ionChange={handleSegmentValue}
+                    color="dark"
+                    name="cat"
+                    id="cat"
+                    class="formSegment"
+                    style="width: 100%;"
+                    >
+                        <!-- <ion-segment-button value="">
+                          <ion-label>?</ion-label>
+                        </ion-segment-button> -->
+                        <ion-segment-button value="1">
+                          <ion-label>Breakfast</ion-label>
+                        </ion-segment-button>
+                        <ion-segment-button value="2">
+                            <ion-label>Lunch</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="3">
+                            <ion-label>Dinner</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="4">
+                            <ion-label>Snack</ion-label>
+                          </ion-segment-button>
+      
+                    </ion-segment>
+
+
+                </ion-item>
+            </ion-col>
+        </ion-row>
+
 
         <ion-row>
             <ion-col>
@@ -185,7 +230,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
             </ion-col>
         </ion-row>
     </ion-grid>    
-    <pre>{JSON.stringify(entry,null,2)}</pre>
+    <!-- <div class="ion-padding">{JSON.stringify(entry)}</div> -->
 
   <style>
   .Grid {
@@ -230,6 +275,9 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
       background-color: var(--ion-background-color) !important;
       border-radius: 5px;
   }
+  .formSegment {
+    border: 1px solid rgb(212, 212, 212);
+  }
   .formInputBoxCentered {
       height: 50px;
       border: 1px solid rgb(212, 212, 212);
@@ -253,5 +301,8 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
       -webkit-flex-flow: row wrap;
       -moz-flex-flow: row wrap;
       justify-content: center;
+  }
+  ion-segment {
+    --background: var(--ion-color-primary);
   }
   </style>
