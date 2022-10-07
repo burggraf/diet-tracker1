@@ -1,2 +1,2 @@
-vite build && cp -r dist/client/* docs
+vite build && cp -r dist/client/* docs && touch docs/.nojekyll
 
