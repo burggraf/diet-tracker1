@@ -294,7 +294,7 @@ export default class SupabaseDataService {
     let loader;
     if (!options.cached) loader = await loadingBox('loading days...')
     if (!this.isConnected()) { await this.connect() }
-    const { data, error } = await supabase.from('days').select().order('date');
+    const { data, error } = await supabase.from('days').select().order('date',{ ascending: false }).limit(31);
     if (!options.cached) loader.dismiss();
     return { data, error };
   }

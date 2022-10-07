@@ -80,7 +80,6 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
         </ion-row>
         <ion-row>
             <ion-col>
-  
                 <ion-item class="formItem" lines="none">
                     <ion-input 
                         on:ionChange={handleTextValue}
@@ -93,11 +92,60 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                           icon={mailOutline} 
                           slot="start" size="large" color="medium"></ion-icon>
                     </ion-input>
-  
                 </ion-item>
-  
             </ion-col>
         </ion-row>
+
+        <ion-row>
+            <ion-col>
+                <ion-label>Cost Per Serving</ion-label>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-item class="formItem" lines="none">
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col style="text-align: center;"><ion-label>Per Serving</ion-label></ion-col>
+                            <ion-col style="text-align: center;"><ion-label>Servings</ion-label></ion-col>
+                            <ion-col style="text-align: center;"><ion-label>Total</ion-label></ion-col>
+                        </ion-row>
+                        <ion-row>
+                            <ion-col>
+                                <ion-input 
+                                    on:ionChange={handleTextValue}
+                                    name="cps"
+                                    class="formInputBoxCentered"
+                                    type="number" 
+                                    value={entry.cps}>
+                                </ion-input>        
+                            </ion-col>
+                            <ion-col>
+                                <ion-input 
+                                    on:ionChange={handleTextValue}
+                                    name="qty"
+                                    class="formInputBoxCentered"
+                                    type="number" 
+                                    value={entry.qty}>
+                                </ion-input>        
+                            </ion-col>
+                            <ion-col>
+                                <ion-input 
+                                    on:ionChange={handleTextValue}
+                                    name="amt"
+                                    class="formInputBoxCentered"
+                                    type="number" 
+                                    value={entry.amt}>
+                                </ion-input>        
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+
+                </ion-item>
+
+            </ion-col>
+        </ion-row>
+
 
         <ion-row>
             <ion-col>
@@ -106,7 +154,6 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
         </ion-row>
         <ion-row>
             <ion-col>
-  
                 <ion-item class="formItem" lines="none">
                     <ion-textarea 
                         on:ionChange={handleTextValue}
@@ -116,9 +163,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                         value={entry.desc}
                         placeholder="Description">
                     </ion-textarea>
-  
                 </ion-item>
-  
             </ion-col>
         </ion-row>
 
@@ -159,11 +204,30 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
       --padding-end: 0px;
       --inner-padding-end: 0px;
   }
+  .formItem3 {
+      --padding-start: 0px;
+      --padding-end: 0px;
+      --inner-padding-end: 0px;
+      width: 33%;
+  }
   .formInputBoxWithIcon {
       height: 50px;
       border: 1px solid rgb(212, 212, 212);
       background-color: var(--ion-background-color) !important;
       border-radius: 5px;
+  }
+  .formInputBox {
+      height: 50px;
+      border: 1px solid rgb(212, 212, 212);
+      background-color: var(--ion-background-color) !important;
+      border-radius: 5px;
+  }
+  .formInputBoxCentered {
+      height: 50px;
+      border: 1px solid rgb(212, 212, 212);
+      background-color: var(--ion-background-color) !important;
+      border-radius: 5px;
+      text-align: center;
   }
   .formTextarea {
       border: 1px solid rgb(212, 212, 212);

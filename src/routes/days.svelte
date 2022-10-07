@@ -41,7 +41,8 @@
 	<ion-list>
 		{#if days && days.length }
 			{#each days as day}
-					<ion-item on:click={() => gotoDay(day.id)}>
+					<ion-item on:click={() => gotoDay(day.id)} 
+						class={(new Date().toISOString().substring(0, 10))===day.date ? 'today' : 'notToday'}>
 						{day.date}
 						<ion-note slot="end">
 							<!-- {day.food_total.toFixed(0)} -->
@@ -58,4 +59,10 @@
 </ion-content>
 
 <style>
+	.today {
+		font-weight: bold;
+	}
+	.notToday {
+		font-weight: normal;
+	}
 </style>
