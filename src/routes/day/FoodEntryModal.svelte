@@ -27,6 +27,14 @@
     function handleTextValue(event) {
         entry[event.target.name] = event.target.value!;
     }
+    function handleNumberValue(event) {
+        try {
+            entry[event.target.name] = parseFloat(event.target.value!) || 0;
+        } catch (err) {
+            console.error('handleNumberValue error', err)
+            entry[event.target.name] = 0;
+        }
+    }
 
     function save() {
         modalController.dismiss({ data: entry });
@@ -113,7 +121,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                         <ion-row>
                             <ion-col>
                                 <ion-input 
-                                    on:ionChange={handleTextValue}
+                                    on:ionChange={handleNumberValue}
                                     name="cps"
                                     class="formInputBoxCentered"
                                     type="number" 
@@ -122,7 +130,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                             </ion-col>
                             <ion-col>
                                 <ion-input 
-                                    on:ionChange={handleTextValue}
+                                    on:ionChange={handleNumberValue}
                                     name="qty"
                                     class="formInputBoxCentered"
                                     type="number" 
@@ -131,7 +139,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                             </ion-col>
                             <ion-col>
                                 <ion-input 
-                                    on:ionChange={handleTextValue}
+                                    on:ionChange={handleNumberValue}
                                     name="amt"
                                     class="formInputBoxCentered"
                                     type="number" 

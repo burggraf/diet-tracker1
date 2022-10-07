@@ -46,7 +46,7 @@
 						{day.date}
 						<ion-note slot="end">
 							<!-- {day.food_total.toFixed(0)} -->
-							stuff
+							{(day?.food_total || 0).toFixed(2)}
 						</ion-note>
 				</ion-item>
 			{/each}

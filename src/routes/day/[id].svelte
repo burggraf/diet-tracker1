@@ -89,6 +89,14 @@
 		if (!day.user_id) {
 			day.user_id = user.id
 		}
+		try {
+			day.food_total = 0;
+			day.food_log.entries.forEach(entry => {
+				day.food_total += entry.amt
+			})
+		} catch (err) {
+			console.error('error calculating food total', err)
+		}
 
 		const { error } = await supabaseDataService.save_day(day)
 		if (error) {
@@ -246,7 +254,7 @@
 	{#if day}
 		<ion-card>
 			<ion-card-header>
-				<ion-card-subtitle>{day?.id}</ion-card-subtitle>
+				<ion-card-subtitle>Total: {(day?.food_total || 0).toFixed(2)}</ion-card-subtitle>
 				<ion-card-title>
 					{#if mode === 'view'}{day?.date}{/if}
 					{#if mode === 'edit'}
@@ -287,7 +295,7 @@
 									{entry?.title}
 									<ion-note slot="end">
 										<!-- {day.food_total.toFixed(0)} -->
-										{entry?.amt || 0}
+										{(entry?.amt || 0).toFixed(2)}
 									</ion-note>
 									<ion-reorder slot="start" />
 								</ion-item>
@@ -309,6 +317,7 @@
 			</ion-card-content>
 		</ion-card>
 	{/if}
+	<pre>{JSON.stringify(day,null,2)}</pre>
 </ion-content>
 
 <style>
