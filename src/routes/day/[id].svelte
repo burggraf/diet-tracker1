@@ -114,6 +114,20 @@
 		} else {
 			id = day.id
 			mode = 'view'
+			if ((new Date().toISOString().substring(0, 10))===day.date) {
+				if( "setAppBadge" in navigator && "clearAppBadge" in navigator){
+					// set the app badge	
+					if (day.food_total) {
+						navigator["setAppBadge"](day.food_total).catch((error) => {
+							console.error("setAppBadge error", error);
+						});
+					} else {
+						navigator["clearAppBadge"].catch((error) => {
+							console.error("clearAppBadge error", error);
+						});
+					};
+				}
+			}
 			// supabaseDataService.updateDataSubscription('day', { id })
 		}
 	}
