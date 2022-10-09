@@ -138,6 +138,7 @@
 					};
 				} else {
 					console.log("no app badge support");
+					toast("no app badge support");
 				}
 			}
 			// supabaseDataService.updateDataSubscription('day', { id })
