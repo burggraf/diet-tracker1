@@ -1,0 +1,1 @@
+import"./index.e2ea8f05.js";import{x as a}from"./index.2b6c56f1.js";const i=async(t,o="danger",s=3e3)=>{await(await a.create({message:t,color:o,cssClass:"toast",position:"top",buttons:[{icon:"close",handler:()=>{console.log("dismiss")}}],duration:s})).present()};export{i as t};
