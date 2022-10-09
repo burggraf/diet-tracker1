@@ -179,16 +179,16 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                         <!-- <ion-segment-button value="">
                           <ion-label>?</ion-label>
                         </ion-segment-button> -->
-                        <ion-segment-button value="1">
+                        <ion-segment-button value="Breakfast">
                           <ion-label>Breakfast</ion-label>
                         </ion-segment-button>
-                        <ion-segment-button value="2">
+                        <ion-segment-button value="Lunch">
                             <ion-label>Lunch</ion-label>
                           </ion-segment-button>
-                          <ion-segment-button value="3">
+                          <ion-segment-button value="Dinner">
                             <ion-label>Dinner</ion-label>
                           </ion-segment-button>
-                          <ion-segment-button value="4">
+                          <ion-segment-button value="Snack">
                             <ion-label>Snack</ion-label>
                           </ion-segment-button>
       

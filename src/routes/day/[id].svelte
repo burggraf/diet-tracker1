@@ -292,12 +292,33 @@
 									on:click={() => {
 										edit_food_log_entry(index)
 									}}>
-									{entry?.title}
-									<ion-note slot="end">
-										<!-- {day.food_total.toFixed(0)} -->
-										{(entry?.amt || 0).toFixed(2)}
-									</ion-note>
 									<ion-reorder slot="start" />
+									<div>
+									{entry?.title}<br/>
+									<span class="description">{entry?.desc || ''}&nbsp;</span>
+									</div>
+									<!-- <ion-grid>
+										<ion-row>
+											<ion-col style="font-weight: bold;">{entry?.title}</ion-col>
+										</ion-row>
+										<ion-row>
+											<ion-col>{entry?.desc}</ion-col>											
+										</ion-row>
+									</ion-grid>										 -->
+									<ion-note slot="end" class="right">
+										<div>
+										{(entry?.amt || 0).toFixed(2)}<br/>
+										<span class="description">{entry?.cat || ''}&nbsp;</span>
+										</div>
+										<!-- <ion-grid>
+											<ion-row>
+												<ion-col style="text-align: right; font-weight: bold;">{(entry?.amt || 0).toFixed(2)}</ion-col>
+											</ion-row>
+											<ion-row>
+												<ion-col  style="text-align: right;">{entry?.cat || ''}</ion-col>
+											</ion-row>
+										</ion-grid>										 -->
+									</ion-note>
 								</ion-item>
 							{/each}
 						{/if}
@@ -331,5 +352,12 @@
 		width: 60%;
 		border: 1px solid;
 		display: inline-block;
+	}
+	.description {
+		color: gray;
+		font-size: 0.8em;
+	}
+	.right {
+		text-align: right;
 	}
 </style>
