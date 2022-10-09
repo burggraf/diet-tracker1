@@ -39,6 +39,9 @@
             console.error('handleNumberValue error', err)
             entry[event.target.name] = 0;
         }
+        if (event.target.name === 'cps' || event.target.name === 'qty') {
+            entry['amt'] = (entry['cps'] * entry['qty']);
+        }
     }
 
     function save() {
