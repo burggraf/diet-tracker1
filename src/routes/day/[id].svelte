@@ -308,7 +308,7 @@
 									<ion-note slot="end" class="right">
 										<div>
 										{(entry?.amt || 0).toFixed(2)}<br/>
-										<span class="description">{entry?.cat || ''}&nbsp;</span>
+										<span class="description">&nbsp;{entry?.cat || ''}</span>
 										</div>
 										<!-- <ion-grid>
 											<ion-row>
