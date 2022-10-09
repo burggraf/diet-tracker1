@@ -3,6 +3,7 @@
 	 this version looks up each individual widget instead of using the widgets recordset
 	*/
 	import { params, goto } from '@roxi/routify'
+	import { toast } from '$services/toast';
 	import {
 		chevronBackOutline,
 		createOutline,
@@ -115,17 +116,28 @@
 			id = day.id
 			mode = 'view'
 			if ((new Date().toISOString().substring(0, 10))===day.date) {
+				console.log("check for badge support");
 				if( "setAppBadge" in navigator && "clearAppBadge" in navigator){
 					// set the app badge	
 					if (day.food_total) {
-						navigator["setAppBadge"](day.food_total).catch((error) => {
+						navigator["setAppBadge"](day.food_total).then((result) => {
+							console.log("setAppBadge result", result);
+							toast("badge set to " + day.food_total);
+						}).catch((error) => {
 							console.error("setAppBadge error", error);
+							toast("setAppBadge error " + JSON.stringify(error));
 						});
 					} else {
-						navigator["clearAppBadge"].catch((error) => {
+						navigator["clearAppBadge"].then((result) => {
+							console.log("clearAppBadge result", result);
+							toast("badge cleared");							
+						}).catch((error) => {
 							console.error("clearAppBadge error", error);
+							toast("clearAppBadge error " + JSON.stringify(error));
 						});
 					};
+				} else {
+					console.log("no app badge support");
 				}
 			}
 			// supabaseDataService.updateDataSubscription('day', { id })
