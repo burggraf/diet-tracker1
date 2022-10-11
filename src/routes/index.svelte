@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-  <title>Landing Page</title>
+  <title>Diet Tracker</title>
 </svelte:head>
 
 <IonPage>
@@ -15,7 +15,7 @@
       <ion-buttons slot="start">
         <ion-menu-button />
       </ion-buttons>
-      <ion-title>Landing Page</ion-title>
+      <ion-title>Diet Tracker</ion-title>
     </ion-toolbar>
   </ion-header>
 

@@ -1,9 +1,11 @@
 <script lang="ts">
     import SupabaseAuthService from "$services/supabase.auth.service";
     import { modalController } from "$ionic/svelte";
-  
+	import FoodSearchModal from './FoodSearchModal.svelte'
+ 
     import { toast } from '$services/toast';
     import { loadingBox } from "$services/loadingMessage";
+    // read food data from json file
     export let entry: any = {};  
 
     import {
@@ -16,6 +18,7 @@
       arrowForwardOutline,
       trashOutline,
       checkmarkOutline,
+      searchOutline,
       link
     } from "ionicons/icons";
   import { saveConfig } from "@ionic/core"
@@ -51,7 +54,39 @@
         entry.deleted = true;
         modalController.dismiss({ data: entry });
     }
-  
+    async function search() {
+        console.log('search')
+        const result = await openFoodSearchBox();
+        console.log('result', result)
+        // showModal = true;
+    }
+
+    const openFoodSearchBox = async () => {
+		const openFoodSearchModalController = await modalController.create({
+			component: FoodSearchModal,
+			// componentProps: {
+			// 	entry: entry,
+			// },
+			showBackdrop: true,
+			backdropDismiss: true,
+		})
+
+		await openFoodSearchModalController.present()
+		const { data } = await openFoodSearchModalController.onWillDismiss();
+		if (data?.data !== null) {	
+            console.log('got data', data.data)
+            entry.title = data.data.name;
+            entry.cps = data.data.calories;
+            entry.qty = 1;
+            entry.amt = entry.cps * entry.qty;
+            entry.desc = data.data.portion;
+			return true;
+		} else {
+			return false;
+		}	
+	}
+
+
   </script>
   
   <svelte:head>
@@ -64,14 +99,21 @@
         <ion-icon 
         on:click={closeOverlay}
         icon={closeOutline} 
-        slot="start" size="large" color="medium"></ion-icon>
+        slot="start" size="large" color="primary"></ion-icon>
       </ion-buttons>
 
       <ion-buttons slot="end">
+
         <ion-icon 
         on:click={deleteEntry}
         icon={trashOutline} 
-        slot="start" size="large" color="medium"></ion-icon>
+        slot="start" size="large" color="primary"></ion-icon>
+
+        <ion-icon 
+        on:click={search}
+        icon={searchOutline} 
+        slot="start" size="large" color="primary"></ion-icon>
+
       </ion-buttons>
 
     </ion-toolbar>
@@ -232,7 +274,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                 <b>Done</b></ion-button>                    
             </ion-col>
         </ion-row>
-    </ion-grid>    
+    </ion-grid>  
     <!-- <div class="ion-padding">{JSON.stringify(entry)}</div> -->
 
   <style>
