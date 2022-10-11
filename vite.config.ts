@@ -6,23 +6,23 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 
 const pwaManifest = {
-  name: 'Ionic Svelte',
-  short_name: 'A really cool app',
-  description: 'Coolness in Vite Svelte and Ionic',
+  name: 'Diet Tracker',
+  short_name: 'Diet Tracker for Mobile and Desktop',
+  description: 'Track your diet and exercise across multiple devices',
   theme_color: '#000000',
   icons: [
     {
-      src: '/assets/img/great-success.png',
+      src: 'assets/img/great-success.png',
       sizes: '192x192',
       type: 'image/png',
     },
     {
-      src: '/assets/img/great-success.png',
+      src: 'assets/img/great-success.png',
       sizes: '512x512',
       type: 'image/png',
     },
     {
-      src: '/assets/img/great-success.png',
+      src: 'assets/img/great-success.png',
       sizes: '512x512',
       type: 'image/png',
       purpose: 'any maskable',
