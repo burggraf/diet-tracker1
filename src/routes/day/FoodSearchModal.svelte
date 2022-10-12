@@ -32,7 +32,7 @@
         setTimeout(()=>{
             const toolbar = document.getElementById('toolbar');
             const thelist = document.getElementById('thelist');
-            thelist.style.height = (thelist.parentElement.parentElement.parentElement.clientHeight - toolbar.clientHeight) + 'px';
+            thelist.style.height = (thelist.parentElement.parentElement.parentElement.clientHeight - (toolbar.clientHeight * 2) - 20) + 'px';
             (document.getElementById('searchbar') as any).setFocus().then((result) => {
                 document.getElementById('searchbar').click();
             });
@@ -42,7 +42,7 @@
     function blurFunction(e) {
         const toolbar = document.getElementById('toolbar');
         const thelist = document.getElementById('thelist');
-        thelist.style.height = (thelist.parentElement.parentElement.parentElement.clientHeight - toolbar.clientHeight) + 'px';
+        thelist.style.height = (thelist.parentElement.parentElement.parentElement.clientHeight - (toolbar.clientHeight * 2) - 20) + 'px';
     }
 
   </script>
