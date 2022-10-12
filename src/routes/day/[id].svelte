@@ -152,14 +152,14 @@
 			created: new Date().toISOString(),
 		}
 
-		const saved = await openFoodEntryBox(entry, day.food_log.entries.length);
+		const saved = await openFoodEntryBox(entry, day.food_log.entries.length, true);
 		console.log('done calling openFoodEntryBox', saved)
 		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
 		save()
 	}
 	const edit_food_log_entry = async (index) => {
-		const saved = await openFoodEntryBox(day.food_log.entries[index], index);
+		const saved = await openFoodEntryBox(day.food_log.entries[index], index, false);
 		console.log('edit_food_log_entry is done calling openFoodEntryBox', saved)
 		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
@@ -176,11 +176,12 @@
 	};
 
 
-	const openFoodEntryBox = async (entry: any, index: number) => {
+	const openFoodEntryBox = async (entry: any, index: number, isNew: boolean) => {
 		const openFodEntryModalController = await modalController.create({
 			component: FoodEntryModal,
 			componentProps: {
 				entry: entry,
+				isNew: isNew
 			},
 			showBackdrop: true,
 			backdropDismiss: true,

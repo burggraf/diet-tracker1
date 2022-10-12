@@ -57,10 +57,12 @@
     }
 
     onMount(() => {
+        (document.getElementById('searchbar') as any).setFocus();
         setTimeout(()=>{
             const toolbar = document.getElementById('toolbar');
             const thelist = document.getElementById('thelist');
             thelist.style.height = (thelist.parentElement.clientHeight - toolbar.clientHeight) + 'px';
+            (document.getElementById('searchbar') as any).setFocus();
         },500)
     })
 
@@ -96,7 +98,7 @@
     </ion-toolbar>
   </ion-header>
   <!-- <ion-content> -->
-  <ion-searchbar placeholder="Search" debounce={500} on:ionChange={search}></ion-searchbar>
+  <ion-searchbar id="searchbar" placeholder="Search" debounce={500} on:ionChange={search}></ion-searchbar>
     <ion-list  id="thelist" style="overflow-y: scroll !important; height: 500px;">
         {#each filteredFood as item}
             <ion-item on:click={() => {save(item)}}>

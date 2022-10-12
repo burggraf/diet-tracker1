@@ -7,7 +7,8 @@
     import { loadingBox } from "$services/loadingMessage";
     // read food data from json file
     export let entry: any = {};  
-
+    export let isNew: boolean;
+    console.log('entry', entry)
     import {
       mailOutline,
       closeOutline,
@@ -104,11 +105,13 @@
 
       <ion-buttons slot="end">
 
+        {#if !isNew}
         <ion-icon 
         on:click={deleteEntry}
         icon={trashOutline} 
         slot="start" size="large" color="primary"></ion-icon>
-
+        {/if}
+        
         <ion-icon 
         on:click={search}
         icon={searchOutline} 
