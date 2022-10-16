@@ -47,6 +47,24 @@
             entry['amt'] = (entry['cps'] * entry['qty']);
         }
     }
+    function focusOnNumericInput(event) {
+        try {
+            if ((parseFloat(event.target.value!) || 0) === 0) {
+                event.target.value = '';
+            }
+        } catch (err) {
+            console.error('error clearing zero value', err)
+        }
+        // put cursor at end of input
+        event.target.getInputElement().then((input) => {
+            console.log('input', input)
+            // set cursor to end of input
+            input.type = 'text';
+            input.setSelectionRange(input.value.length, input.value.length);
+            input.type = 'number';
+        })
+    }
+
 
     function save() {
         modalController.dismiss({ data: entry });
@@ -111,7 +129,7 @@
         icon={trashOutline} 
         slot="start" size="large" color="primary"></ion-icon>
         {/if}
-        
+
         <ion-icon 
         on:click={search}
         icon={searchOutline} 
@@ -175,6 +193,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                             <ion-col>
                                 <ion-input 
                                     on:ionChange={handleNumberValue}
+                                    on:ionFocus={focusOnNumericInput}
                                     name="cps"
                                     class="formInputBoxCentered"
                                     type="number" 
@@ -184,6 +203,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                             <ion-col>
                                 <ion-input 
                                     on:ionChange={handleNumberValue}
+                                    on:ionFocus={focusOnNumericInput}
                                     name="qty"
                                     class="formInputBoxCentered"
                                     type="number" 
@@ -193,6 +213,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                             <ion-col>
                                 <ion-input 
                                     on:ionChange={handleNumberValue}
+                                    on:ionFocus={focusOnNumericInput}
                                     name="amt"
                                     class="formInputBoxCentered"
                                     type="number" 

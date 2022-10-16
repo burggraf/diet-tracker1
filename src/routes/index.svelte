@@ -3,6 +3,7 @@
 
   // import { goto } from "@roxi/routify";
   // $goto("/", {  });
+  console.log('*** index.svelte page');
 </script>
 
 <svelte:head>
