@@ -312,6 +312,19 @@ export default class SupabaseDataService {
     return { data, error };
   }
 
+  public load_today = async () => {
+    let loader;
+    loader = await loadingBox('loading today...')
+    if (!this.isConnected()) { await this.connect() }
+    const { data, error } = await supabase.from('days')
+      .select()
+      .eq('date', (new Date()).toISOString().substr(0,10))
+      .limit(1)
+      .single()
+    loader.dismiss();
+    return { data, error };
+  }
+
 
   public async save_day(day: any) {
     const { data, error} = await this.saveRecord('days', day);

@@ -1,9 +1,25 @@
 <script lang="ts">
   import IonPage from "$ionic/svelte/components/IonPage.svelte";
+  import { onMount } from 'svelte'
+  import { goto } from '@roxi/routify'
+	import SupabaseDataService from '$services/supabase.data.service'
+	const supabaseDataService = SupabaseDataService.getInstance()
 
   // import { goto } from "@roxi/routify";
   // $goto("/", {  });
-  console.log('*** index.svelte page');
+	onMount(async () => {
+    console.log('*** index.svelte page');
+    const {data, error} = await supabaseDataService.load_today();
+    console.log('*** data', data);
+    if (data && data.id) {
+      const id = data.id;
+      // $goto(`/day/${data.id}`);
+      $goto(`/day/[id]`,{id})
+    } else {
+      $goto(`/day/[id]`,{id: 'new'})
+    }
+	})
+
 </script>
 
 <svelte:head>
