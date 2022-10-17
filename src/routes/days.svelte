@@ -58,7 +58,7 @@
 						<ion-note slot="end"
 						class={getToday()===day.date ? 'today' : 'notToday'}>
 							{#if (getToday()===day.date) && settings.daily_budget}
-								<b>{settings.daily_budget - (day?.food_total || 0).toFixed(2)} left&nbsp;&nbsp;</b>
+								<b>[{settings.daily_budget - (day?.food_total || 0).toFixed(2)}]&nbsp;&nbsp;</b>
 							{/if}
 							{(day?.food_total || 0).toFixed(2)}
 						</ion-note>

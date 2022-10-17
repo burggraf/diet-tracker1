@@ -289,16 +289,29 @@
 				<ion-card-subtitle>
 					<ion-grid>
 						<ion-row>
-							<ion-col>Total: {(day?.food_total || 0).toFixed(2)}</ion-col>
+							<ion-col>&nbsp;</ion-col>
 							<ion-col style="text-align: right; font-weight: bold;">
-								Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)}
+								Total: {(day?.food_total || 0).toFixed(2)}&nbsp;&nbsp;
+								<!-- Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)} -->
 							</ion-col>
 						</ion-row>
 					</ion-grid>
 					
 				</ion-card-subtitle>
 				<ion-card-title>
-					{#if mode === 'view'}{day?.date}{/if}
+					{#if mode === 'view'}
+						<ion-grid>
+							<ion-row>
+								<ion-col>
+									{day?.date}
+								</ion-col>
+								<ion-col style="text-align: right;">
+									[{(settings.daily_budget - day?.food_total || 0).toFixed(2)}]
+								</ion-col>
+							</ion-row>
+						</ion-grid>
+						<!-- {day?.date} -->
+					{/if}
 					{#if mode === 'edit'}
 						<ion-label>Date:</ion-label><ion-input
 							value={day.date}
