@@ -39,7 +39,7 @@
 		<ion-buttons slot="start">
 			<ion-menu-button />
 		</ion-buttons>
-		<ion-title>days List</ion-title>
+		<ion-title>Calendar</ion-title>
 		<ion-buttons slot="end">
 			<ion-button on:click={() => gotoDay('new')}>
 				<ion-icon slot="icon-only" icon={addOutline} />

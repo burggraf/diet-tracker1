@@ -38,7 +38,7 @@
 
 	const appPages = [
 		// { title: 'Current User', url: '/TestAuth', icon: person, requireLogin: true },
-		{ title: 'Days', url: '/days', icon: calendarOutline, requireLogin: true },
+		{ title: 'Calendar', url: '/calendar', icon: calendarOutline, requireLogin: true },
 		{ title: 'Settings', url: '/settings', icon: settingsOutline, requireLogin: true },
 		{ title: 'Info', url: '/', icon: informationCircle, requireLogin: false },
 	]

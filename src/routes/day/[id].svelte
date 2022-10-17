@@ -142,13 +142,13 @@
 					console.error('Error deleting day', error)
 				} else {
 					goBack()
-					// window.location.href = '/days'
+					// window.location.href = '/calendar'
 				}
 			},
 		})
 	}
 	const goBack = () => {
-		$goto(`/days`)
+		$goto(`/calendar`)
 	}
 	const add_food_log_entry = async (id) => {
 		if (!day.food_log.entries) {

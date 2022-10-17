@@ -13,6 +13,7 @@
 		settings: {
 			daily_budget: 0,
 			target_weight: 0,
+			water_target: 8,
 		}
 	};
 	let user: User = null
@@ -39,7 +40,11 @@
 			settings.settings = {
 				daily_budget: 0,
 				target_weight: 0,
+				water_target: 8,
 			}
+		}
+		if (typeof settings.settings.water_target === 'undefined') {
+			settings.settings.water_target = 8
 		}
 	})
 
@@ -105,6 +110,14 @@
 			</ion-input>
 		</ion-item>
 		<ion-item>
+			<ion-label>Water Target</ion-label>
+			<ion-input type="number" class="short"
+				value={settings?.settings?.water_target} 
+				on:ionFocus={focusOnNumericInput}
+				on:ionChange={(e) => settings.settings.water_target = e.detail.value}>
+			</ion-input>
+		</ion-item>
+		<ion-item>
 			<ion-label>Target Weight</ion-label>
 			<ion-input type="number" class="short"
 				value={settings?.settings?.target_weight} 
@@ -117,7 +130,7 @@
 			<ion-datetime display-format="MMM DD, YYYY" value={settings?.target_date} on:ionChange={(e) => settings.target_date = e.detail.value}></ion-datetime>
 		</ion-item> -->
 	</ion-list>
-	<pre>{JSON.stringify(settings,null,2)}</pre>
+	<!-- <pre>{JSON.stringify(settings,null,2)}</pre> -->
 </ion-content>
 
 <style>
