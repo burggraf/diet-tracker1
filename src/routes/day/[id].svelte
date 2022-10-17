@@ -25,6 +25,7 @@
 
 	let user = null
 	let userSubscription: any
+	let settings: any = {daily_budget: 0, target_weight: 0}
 
 	let id = $params.id
 	let mode = 'view'
@@ -55,7 +56,10 @@
 		})
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		const { data, error } = await supabaseDataService.getSettings();
+		console.log('*** settings', data, error);
+		settings = data.settings || {};
 		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
 			user = newuser
 			//console.log('got user:', user)
@@ -256,7 +260,17 @@
 	{#if day}
 		<ion-card>
 			<ion-card-header>
-				<ion-card-subtitle>Total: {(day?.food_total || 0).toFixed(2)}</ion-card-subtitle>
+				<ion-card-subtitle>
+					<ion-grid>
+						<ion-row>
+							<ion-col>Total: {(day?.food_total || 0).toFixed(2)}</ion-col>
+							<ion-col style="text-align: right; font-weight: bold;">
+								Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)}
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+					
+				</ion-card-subtitle>
 				<ion-card-title>
 					{#if mode === 'view'}{day?.date}{/if}
 					{#if mode === 'edit'}

@@ -312,13 +312,20 @@ export default class SupabaseDataService {
     return { data, error };
   }
 
+  public getToday = () => {
+		const date = new Date();
+		return new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+                    .toISOString()
+                    .split("T")[0];
+		}
+
   public load_today = async () => {
     let loader;
     loader = await loadingBox('loading today...')
     if (!this.isConnected()) { await this.connect() }
     const { data, error } = await supabase.from('days')
       .select()
-      .eq('date', (new Date()).toISOString().substr(0,10))
+      .eq('date', this.getToday())
       .limit(1)
       .single()
     loader.dismiss();
@@ -368,6 +375,20 @@ export default class SupabaseDataService {
       return { data: {}, error: null };  
     }
   } 
+
+  public async getSettings() {
+    const { data, error } = 
+    await supabase.from('settings')
+    .select('*')
+    .limit(1)
+    .single(); // return a single object (not an array)
+    return { data, error };  
+  }
+  public async saveSettings(settings: any) {
+    console.log('** saveSettings', settings);
+    const { data, error} = await supabase.from('settings').upsert(settings);
+    return { data, error };
+  }
 
   public async saveProfile(profile: any) {
     const { data, error } = 

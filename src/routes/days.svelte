@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { addOutline } from 'ionicons/icons'
 	import SupabaseDataService from '$services/supabase.data.service'
 	import { goto } from '@roxi/routify'
 	const supabaseDataService = SupabaseDataService.getInstance()
 
+	let settings: any = {daily_budget: 0, target_weight: 0}
 	let days: any[]; // = cache || []
 	const recordset = 
 		supabaseDataService
@@ -14,13 +15,23 @@
 			console.log('*** days', days);
 		}
 	)
-
+	onMount(async () => {
+		const { data, error } = await supabaseDataService.getSettings();
+		console.log('*** settings', data, error);
+		settings = data.settings || {};
+	})
 	onDestroy(() => {
 		recordset.unsubscribe()
 	})
 	const gotoDay = (id: string) => {
 		$goto(`/day/[id]`,{id})
 	}
+	function getToday() {
+		const date = new Date();
+		return new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+                    .toISOString()
+                    .split("T")[0];
+		}
 </script>
 
 <ion-header translucent="true">
@@ -42,10 +53,13 @@
 		{#if days && days.length }
 			{#each days as day}
 					<ion-item on:click={() => gotoDay(day.id)} 
-						class={(new Date().toISOString().substring(0, 10))===day.date ? 'today' : 'notToday'}>
+						class={getToday()===day.date ? 'today' : 'notToday'}>
 						{day.date}
-						<ion-note slot="end">
-							<!-- {day.food_total.toFixed(0)} -->
+						<ion-note slot="end"
+						class={getToday()===day.date ? 'today' : 'notToday'}>
+							{#if (getToday()===day.date) && settings.daily_budget}
+								<b>{settings.daily_budget - (day?.food_total || 0).toFixed(2)} left&nbsp;&nbsp;</b>
+							{/if}
 							{(day?.food_total || 0).toFixed(2)}
 						</ion-note>
 				</ion-item>

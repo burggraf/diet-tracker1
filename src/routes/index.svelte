@@ -10,7 +10,7 @@
 	onMount(async () => {
     console.log('*** index.svelte page');
     const {data, error} = await supabaseDataService.load_today();
-    console.log('*** data', data);
+    console.log('*** load_today data', data);
     if (data && data.id) {
       const id = data.id;
       // $goto(`/day/${data.id}`);
