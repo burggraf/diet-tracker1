@@ -372,6 +372,16 @@ export default class SupabaseDataService {
     }
   } 
 
+  public async getCurrentWeight() {
+    const { data, error } = 
+    await supabase.from('days')
+    .select('weight')
+    .order('date', { ascending: false })
+    .limit(1)
+    .single(); // return a single object (not an array)
+    return { data, error };  
+  }
+
   public async getSettings() {
     const { data, error } = 
     await supabase.from('settings')

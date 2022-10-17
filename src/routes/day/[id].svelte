@@ -3,7 +3,7 @@
 	 this version looks up each individual widget instead of using the widgets recordset
 	*/
 	import { params, goto } from '@roxi/routify'
-	import { toast } from '$services/toast';
+	import { toast } from '$services/toast'
 	import {
 		chevronBackOutline,
 		createOutline,
@@ -28,7 +28,7 @@
 
 	let user = null
 	let userSubscription: any
-	let settings: any = {daily_budget: 0, target_weight: 0}
+	let settings: any = { daily_budget: 0, target_weight: 0 }
 
 	let id = $params.id
 	let mode = 'view'
@@ -62,13 +62,18 @@
 	}
 
 	onMount(async () => {
-		const { data, error } = await supabaseDataService.getSettings();
-		console.log('*** settings', data, error);
-		settings = data.settings || {};
+		const { data, error } = await supabaseDataService.getSettings()
+		console.log('*** settings', data, error)
+		settings = data.settings || {}
 		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
 			user = newuser
 			//console.log('got user:', user)
 		})
+		if (id === 'new') {
+			const { data, error } = await supabaseDataService.getCurrentWeight()
+			if (error) console.error('getCurrentWeight error', error)
+			else day.weight = data.weight;
+		}
 	})
 
 	onDestroy(() => {
@@ -96,15 +101,15 @@
 		// validate here...
 		console.log('save the day', day)
 		console.log('id is currently', id)
-		let savingNewDay = false;
-		if (id === 'new') savingNewDay = true;
+		let savingNewDay = false
+		if (id === 'new') savingNewDay = true
 
 		if (!day.user_id) {
 			day.user_id = user.id
 		}
 		try {
-			day.food_total = 0;
-			day.food_log.entries.forEach(entry => {
+			day.food_total = 0
+			day.food_log.entries.forEach((entry) => {
 				day.food_total += entry.amt
 			})
 		} catch (err) {
@@ -114,14 +119,14 @@
 		const { error } = await supabaseDataService.save_day(day)
 		if (error) {
 			console.log('error message is: ', error.message)
-			if (error.message.startsWith("duplicate key value violates unique constraint")) {
-      			console.log('DUPLICATE DAY');
+			if (error.message.startsWith('duplicate key value violates unique constraint')) {
+				console.log('DUPLICATE DAY')
 				alert({
 					header: 'Duplicate Day',
- 				    //subHeader: '',
-				    message: 'This day already exists.  Please edit the existing day.',
+					//subHeader: '',
+					message: 'This day already exists.  Please edit the existing day.',
 				})
-    		} else {
+			} else {
 				console.error('save day error', error)
 			}
 		} else {
@@ -168,14 +173,14 @@
 			created: new Date().toISOString(),
 		}
 
-		const saved = await openFoodEntryBox(entry, day.food_log.entries.length, true);
+		const saved = await openFoodEntryBox(entry, day.food_log.entries.length, true)
 		console.log('done calling openFoodEntryBox', saved)
 		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
 		save()
 	}
 	const edit_food_log_entry = async (index) => {
-		const saved = await openFoodEntryBox(day.food_log.entries[index], index, false);
+		const saved = await openFoodEntryBox(day.food_log.entries[index], index, false)
 		console.log('edit_food_log_entry is done calling openFoodEntryBox', saved)
 		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
@@ -183,39 +188,39 @@
 	}
 
 	const reorder_food_log = ({ detail }) => {
-			const { from, to } = detail
-			const item = day.food_log.entries.splice(from, 1)[0]
-			day.food_log.entries.splice(to, 0, item)
-			detail.complete()
-			console.log('reorder_food_log: day', day)
-			save()
-	};
-
+		const { from, to } = detail
+		const item = day.food_log.entries.splice(from, 1)[0]
+		day.food_log.entries.splice(to, 0, item)
+		detail.complete()
+		console.log('reorder_food_log: day', day)
+		save()
+	}
 
 	const openFoodEntryBox = async (entry: any, index: number, isNew: boolean) => {
 		const openFodEntryModalController = await modalController.create({
 			component: FoodEntryModal,
 			componentProps: {
 				entry: entry,
-				isNew: isNew
+				isNew: isNew,
 			},
 			showBackdrop: true,
 			backdropDismiss: true,
 		})
 
 		await openFodEntryModalController.present()
-		const { data } = await openFodEntryModalController.onWillDismiss();
-		if (data?.data !== null) {			
-			if (data.data.deleted) { // check for deleted entry...
+		const { data } = await openFodEntryModalController.onWillDismiss()
+		if (data?.data !== null) {
+			if (data.data.deleted) {
+				// check for deleted entry...
 				day.food_log.entries.splice(index, 1)
 			} else {
 				day.food_log.entries[index] = data.data
 			}
 			console.log('*** day.food_log.entries', day.food_log.entries)
-			return true;
+			return true
 		} else {
-			return false;
-		}	
+			return false
+		}
 	}
 	async function upWater() {
 		day.water_log.entries.push({
@@ -223,17 +228,44 @@
 			amt: 1,
 			created: new Date().toISOString(),
 		})
-		day.water_total++;
-		save();
+		day.water_total++
+		save()
 	}
 	async function downWater() {
-		if (day.water_total <= 0) return;
+		if (day.water_total <= 0) return
 		// find the last entry and delete it
 		day.water_log.entries.pop()
-		day.water_total--;
+		day.water_total--
+		save()
+	}
+	function handleNumberValue(event) {
+		try {
+			day[event.target.name] = parseFloat(event.target.value!) || 0
+		} catch (err) {
+			console.error('handleNumberValue error', err)
+			day[event.target.name] = 0
+		}
+	}
+	function focusOnNumericInput(event) {
+		try {
+			if ((parseFloat(event.target.value!) || 0) === 0) {
+				event.target.value = ''
+			}
+		} catch (err) {
+			console.error('error clearing zero value', err)
+		}
+		// put cursor at end of input
+		event.target.getInputElement().then((input) => {
+			console.log('input', input)
+			// set cursor to end of input
+			input.type = 'text'
+			input.setSelectionRange(input.value.length, input.value.length)
+			input.type = 'number'
+		})
+	}
+	function blurOnNumericInput(event) {
 		save();
 	}
-
 </script>
 
 <ion-header translucent="true">
@@ -293,7 +325,7 @@
 						<ion-row>
 							<ion-col style="text-align: left; font-weight: bold;">
 								Total: {(day?.food_total || 0).toFixed(2)}
-							</ion-col>	
+							</ion-col>
 							<ion-col style="text-align: right; font-weight: bold;">
 								Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)}
 							</ion-col>
@@ -302,8 +334,10 @@
 				</ion-card-subtitle>
 				<ion-card-title style="text-align: center;">
 					{#if mode === 'view'}
-					{ new Date((new Date(day?.date).getTime() + (new Date(day?.date).getTimezoneOffset() * 60000 ))).toDateString()}
-					<!-- {day?.date} -->
+						{new Date(
+							new Date(day?.date).getTime() + new Date(day?.date).getTimezoneOffset() * 60000
+						).toDateString()}
+						<!-- {day?.date} -->
 					{/if}
 					{#if mode === 'edit'}
 						<ion-label>Date:</ion-label><ion-input
@@ -333,17 +367,19 @@
 					<ion-reorder-group
 						id="food_log_group"
 						disabled="false"
-						on:ionItemReorder={reorder_food_log}>
+						on:ionItemReorder={reorder_food_log}
+					>
 						{#if day?.food_log?.entries}
 							{#each day?.food_log?.entries as entry, index}
 								<ion-item
 									on:click={() => {
 										edit_food_log_entry(index)
-									}}>
+									}}
+								>
 									<ion-reorder slot="start" />
 									<div>
-									{entry?.title}<br/>
-									<span class="description">{entry?.desc || ''}&nbsp;</span>
+										{entry?.title}<br />
+										<span class="description">{entry?.desc || ''}&nbsp;</span>
 									</div>
 									<!-- <ion-grid>
 										<ion-row>
@@ -355,8 +391,8 @@
 									</ion-grid>										 -->
 									<ion-note slot="end" class="right">
 										<div>
-										{(entry?.amt || 0).toFixed(2)}<br/>
-										<span class="description">&nbsp;{entry?.cat || ''}</span>
+											{(entry?.amt || 0).toFixed(2)}<br />
+											<span class="description">&nbsp;{entry?.cat || ''}</span>
 										</div>
 										<!-- <ion-grid>
 											<ion-row>
@@ -388,15 +424,43 @@
 		<ion-footer>
 			<ion-card>
 				<ion-card-content>
-					<h1 style="text-align: right;">Water&nbsp;&nbsp;
-						<ion-icon color={day.water_total <= 0 ? 'medium': 'dark'} icon={removeCircleOutline} size="large" on:click={downWater} />
-						<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
-						<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
-						</h1>	
-		
+					<ion-grid>
+						<ion-row>
+							<ion-col>
+								<div class="left">
+									<div class="footertitle">Weight</div>
+									<div class="footertitle">
+										<ion-input
+										on:ionChange={handleNumberValue}
+										on:ionFocus={focusOnNumericInput}
+										on:ionBlur={blurOnNumericInput}
+										name="weight"
+										class="weightBox"
+										type="number"
+										value={day?.weight}
+									/>
+									</div>
+								</div>
+							</ion-col>
+							<ion-col>
+								<div class="right">
+									<div class="footertitle">Water</div>
+									<div class="footertitle together">
+										<ion-icon
+											color={day.water_total <= 0 ? 'medium' : 'dark'}
+											icon={removeCircleOutline}
+											size="large"
+											on:click={downWater}
+										/>
+										<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
+										<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
+									</div>
+								</div>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
 				</ion-card-content>
 			</ion-card>
-
 		</ion-footer>
 	{/if}
 	<!-- day?.date: {day?.date}<br /> -->
@@ -433,5 +497,27 @@
 	}
 	.right {
 		text-align: right;
+	}
+	.weightBox {
+		height: 50px;
+		width: 90px;
+		max-width: 90px;
+		border: 1px solid rgb(212, 212, 212);
+		background-color: var(--ion-background-color) !important;
+		border-radius: 5px;
+		text-align: center;
+	}
+	.footertitle {
+		font-size: larger;
+		text-align: center;
+	}
+	.left {
+		text-align: left;
+	}
+	.right {
+		text-align: right;
+	}
+	.together {
+		page-break-inside: avoid;
 	}
 </style>
