@@ -23,6 +23,8 @@
 	import type { User } from '@supabase/supabase-js'
 
 	import { onDestroy, onMount } from 'svelte'
+	import SupabaseUtilityService from '$services/utility.functions.service'
+	const utils = SupabaseUtilityService.getInstance()
 
 	let user = null
 	let userSubscription: any
@@ -289,28 +291,19 @@
 				<ion-card-subtitle>
 					<ion-grid>
 						<ion-row>
-							<ion-col>&nbsp;</ion-col>
+							<ion-col style="text-align: left; font-weight: bold;">
+								Total: {(day?.food_total || 0).toFixed(2)}
+							</ion-col>	
 							<ion-col style="text-align: right; font-weight: bold;">
-								Total: {(day?.food_total || 0).toFixed(2)}&nbsp;&nbsp;
-								<!-- Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)} -->
+								Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)}
 							</ion-col>
 						</ion-row>
 					</ion-grid>
-					
 				</ion-card-subtitle>
-				<ion-card-title>
+				<ion-card-title style="text-align: center;">
 					{#if mode === 'view'}
-						<ion-grid>
-							<ion-row>
-								<ion-col>
-									{day?.date}
-								</ion-col>
-								<ion-col style="text-align: right;">
-									[{(settings.daily_budget - day?.food_total || 0).toFixed(2)}]
-								</ion-col>
-							</ion-row>
-						</ion-grid>
-						<!-- {day?.date} -->
+					{ new Date((new Date(day?.date).getTime() + (new Date(day?.date).getTimezoneOffset() * 60000 ))).toDateString()}
+					<!-- {day?.date} -->
 					{/if}
 					{#if mode === 'edit'}
 						<ion-label>Date:</ion-label><ion-input
@@ -383,11 +376,6 @@
 						<ion-icon icon={addCircleOutline} slot="start" />
 						new food entry
 					</ion-item>
-					<ion-item>Water<ion-label slot="end">
-						<ion-icon color={day.water_total <= 0 ? 'medium': 'dark'} icon={removeCircleOutline} size="large" on:click={downWater} />
-						<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
-						<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
-					</ion-label></ion-item>
 				</ion-list>
 
 				<br />
@@ -397,16 +385,36 @@
 				<br />
 			</ion-card-content>
 		</ion-card>
+		<ion-footer>
+			<ion-card>
+				<ion-card-content>
+					<h1 style="text-align: right;">Water&nbsp;&nbsp;
+						<ion-icon color={day.water_total <= 0 ? 'medium': 'dark'} icon={removeCircleOutline} size="large" on:click={downWater} />
+						<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
+						<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
+						</h1>	
+		
+				</ion-card-content>
+			</ion-card>
+
+		</ion-footer>
 	{/if}
+	<!-- day?.date: {day?.date}<br /> -->
 	<!-- <pre>{JSON.stringify(day.water_log.entries,null,2)}</pre> -->
 	<!-- <pre>{JSON.stringify(day,null,2)}</pre> -->
 </ion-content>
 
 <style>
 	.water-digits {
-		font-size: 2em;
+		/* font-size: 2em; */
 		font-weight: bold;
-		font-family: 'Courier New', Courier, monospace;
+		/* font-family: 'Courier New', Courier, monospace; */
+	}
+	.water-line {
+		display: flex;
+		flex-direction: row;
+		justify-content: right;
+		align-items: center;
 	}
 	ion-label {
 		display: inline-block;

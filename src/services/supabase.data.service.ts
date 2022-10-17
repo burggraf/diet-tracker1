@@ -3,6 +3,9 @@ import { loadingBox } from '$services/loadingMessage'
 import NetworkService from '$services/network.service';
 // import { toast } from '$services/toast';
 import { BehaviorSubject } from 'rxjs';
+import SupabaseUtilityService from '$services/utility.functions.service'
+const utils = SupabaseUtilityService.getInstance()
+
 
 const VITE_SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL
 const VITE_SUPABASE_KEY: string = import.meta.env.VITE_SUPABASE_KEY
@@ -312,20 +315,13 @@ export default class SupabaseDataService {
     return { data, error };
   }
 
-  public getToday = () => {
-		const date = new Date();
-		return new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
-                    .toISOString()
-                    .split("T")[0];
-		}
-
   public load_today = async () => {
     let loader;
     loader = await loadingBox('loading today...')
     if (!this.isConnected()) { await this.connect() }
     const { data, error } = await supabase.from('days')
       .select()
-      .eq('date', this.getToday())
+      .eq('date', utils.getToday())
       .limit(1)
       .single()
     loader.dismiss();
