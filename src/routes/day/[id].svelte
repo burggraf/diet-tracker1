@@ -11,6 +11,7 @@
 		closeOutline,
 		trashOutline,
 		addCircleOutline,
+		removeCircleOutline,
 	} from 'ionicons/icons'
 	import { modalController } from '$ionic/svelte'
 	import FoodEntryModal from './FoodEntryModal.svelte'
@@ -42,8 +43,10 @@
 			created_at: new Date().toISOString(),
 			date: new Date().toISOString().substring(0, 10),
 			food_log: { entries: [] },
+			food_total: 0,
 			activity_log: { entries: [] },
 			water_log: { entries: [] },
+			water_total: 0,
 			weight: 0,
 			notes: '',
 		}
@@ -90,6 +93,9 @@
 	const save = async () => {
 		// validate here...
 		console.log('save the day', day)
+		console.log('id is currently', id)
+		let savingNewDay = false;
+		if (id === 'new') savingNewDay = true;
 
 		if (!day.user_id) {
 			day.user_id = user.id
@@ -120,6 +126,10 @@
 			id = day.id
 			mode = 'view'
 			// supabaseDataService.updateDataSubscription('day', { id })
+		}
+		if (savingNewDay) {
+			console.log('*** day is new, redirect to', '/day/' + day.id)
+			$goto('/day/' + day.id)
 		}
 	}
 	const delete_day = async () => {
@@ -204,6 +214,22 @@
 		} else {
 			return false;
 		}	
+	}
+	async function upWater() {
+		day.water_log.entries.push({
+			id: supabaseDataService.gen_random_uuid(),
+			amt: 1,
+			created: new Date().toISOString(),
+		})
+		day.water_total++;
+		save();
+	}
+	async function downWater() {
+		if (day.water_total <= 0) return;
+		// find the last entry and delete it
+		day.water_log.entries.pop()
+		day.water_total--;
+		save();
 	}
 
 </script>
@@ -342,8 +368,13 @@
 
 					<ion-item on:click={add_food_log_entry}>
 						<ion-icon icon={addCircleOutline} slot="start" />
-						add new entry
+						new food entry
 					</ion-item>
+					<ion-item>Water<ion-label slot="end">
+						<ion-icon color={day.water_total <= 0 ? 'medium': 'dark'} icon={removeCircleOutline} size="large" on:click={downWater} />
+						<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
+						<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
+					</ion-label></ion-item>
 				</ion-list>
 
 				<br />
@@ -354,10 +385,16 @@
 			</ion-card-content>
 		</ion-card>
 	{/if}
+	<!-- <pre>{JSON.stringify(day.water_log.entries,null,2)}</pre> -->
 	<!-- <pre>{JSON.stringify(day,null,2)}</pre> -->
 </ion-content>
 
 <style>
+	.water-digits {
+		font-size: 2em;
+		font-weight: bold;
+		font-family: 'Courier New', Courier, monospace;
+	}
 	ion-label {
 		display: inline-block;
 		width: 40%;
