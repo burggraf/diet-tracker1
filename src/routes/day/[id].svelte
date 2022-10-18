@@ -25,8 +25,6 @@
 	import SupabaseUtilityService from '$services/utility.functions.service'
 	const utils = SupabaseUtilityService.getInstance()
 
-	let settings: any = { daily_budget: 0, target_weight: 0 }
-
 	let id = $params.id
 	let mode = 'view'
 
@@ -64,9 +62,6 @@
 			$goto('/info')
 			return;
 		}
-		const { data, error } = await supabaseDataService.getSettings($currentUser?.id)
-		console.log('*** settings', data, error)
-		settings = data.settings || {}
 		if (id === 'new') {
 			const { data, error } = await supabaseDataService.getCurrentWeight()
 			if (error) console.error('getCurrentWeight error', error)
@@ -324,7 +319,9 @@
 								Total: {(day?.food_total || 0).toFixed(2)}
 							</ion-col>
 							<ion-col style="text-align: right; font-weight: bold;">
-								Left: {(settings.daily_budget - day?.food_total || 0).toFixed(2)}
+								{#if $currentUser?.user_metadata?.daily_budget}
+								Left: {($currentUser?.user_metadata?.daily_budget - day?.food_total || 0).toFixed(2)}
+								{/if}
 							</ion-col>
 						</ion-row>
 					</ion-grid>
