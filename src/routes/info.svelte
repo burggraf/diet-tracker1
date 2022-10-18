@@ -1,25 +1,6 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte'
 	import Login from '$components/Login/Login.svelte'
-
-	import SupabaseAuthService from '$services/supabase.auth.service'
-	import type { User } from '@supabase/supabase-js'
-	let user = null
-	let userSubscription: any
-
-	onMount(async () => {
-		userSubscription = SupabaseAuthService.user.subscribe(async (newuser: User | null) => {
-			user = newuser
-		})
-	})
-
-	onDestroy(() => {
-		try {
-			userSubscription.unsubscribe()
-		} catch (err) {
-			console.error('error unsubscribing', err)
-		}
-	})
+	import { currentUser } from '$services/user.store';
 </script>
 
 <ion-header translucent="true">
@@ -40,7 +21,7 @@
     <div class="grid500 center">
         About Diet Tracker... <br /><br />
     </div>
-	{#if user}
+	{#if $currentUser}
     <div class="grid500 center">
         logged in
     </div>
@@ -57,6 +38,7 @@
 		/>
         </div>
 	{/if}
+    <!-- currentUser: {JSON.stringify($currentUser)} -->
 </ion-content>
 
 <style>

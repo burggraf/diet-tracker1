@@ -231,6 +231,13 @@ export default class SupabaseAuthService {
     }  
     return token;
   }
+
+  public saveSettings = async (settings: any) => {
+    const { user, error } = await SupabaseAuthService.supabase.auth.update({
+      data: settings
+    })    
+    return { user, error };
+  }
 }
 
 export { SupabaseAuthService };//, User };

@@ -292,13 +292,14 @@ export default class SupabaseDataService {
     return { data, error };
   }
 
-
   public load_days = async (options: any = {}) => {
+    console.log('load_days: options', options);
     let loader;
     if (!options.cached) loader = await loadingBox('loading days...')
     if (!this.isConnected()) { await this.connect() }
     const { data, error } = await supabase.from('days').select().order('date',{ ascending: false }).limit(31);
     if (!options.cached) loader.dismiss();
+    console.log('load_days: data, error', data, error);
     return { data, error };
   }
 
@@ -382,12 +383,16 @@ export default class SupabaseDataService {
     return { data, error };  
   }
 
-  public async getSettings() {
+  public async getSettings(uid: string) {
+    if (!this.isConnected()) { await this.connect() }
+    console.log('### supabaseDataService.getSettings, uid:', uid);
     const { data, error } = 
     await supabase.from('settings')
     .select('*')
+    .eq('user_id', uid)
     .limit(1)
     .single(); // return a single object (not an array)
+    console.log('result-> supabaseDataService.getSettings, data:', data, error);
     return { data, error };  
   }
   public async saveSettings(settings: any) {

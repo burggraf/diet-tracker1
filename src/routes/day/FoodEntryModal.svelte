@@ -1,5 +1,4 @@
 <script lang="ts">
-    import SupabaseAuthService from "$services/supabase.auth.service";
     import { modalController } from "$ionic/svelte";
 	import FoodSearchModal from './FoodSearchModal.svelte'
  

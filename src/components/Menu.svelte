@@ -1,7 +1,14 @@
 <script lang="ts">
+	import { currentUser } from '$services/user.store'
 	// import { IonicConfig } from '@ionic/core/components';
 	import { menuController, registerMenu } from '$ionic/svelte'
-	import { settings, person, informationCircle, calendarOutline, settingsOutline } from 'ionicons/icons'
+	import {
+		settings,
+		person,
+		informationCircle,
+		calendarOutline,
+		settingsOutline,
+	} from 'ionicons/icons'
 	import { onDestroy, onMount } from 'svelte'
 	import Login from '$components/Login/Login.svelte'
 	import SupabaseAuthService from '$services/supabase.auth.service'
@@ -12,6 +19,9 @@
 	import { toast } from '$services/toast'
 	import { showConfirm } from '$services/alert'
 
+	import SupabaseDataService from '$services/supabase.data.service'
+	const supabaseDataService = SupabaseDataService.getInstance()
+
 	let user = null
 	let userSubscription: any
 	let onlineSubscription: any
@@ -21,8 +31,14 @@
 	onMount(() => {
 		registerMenu('mainmenu')
 
-		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
+		userSubscription = SupabaseAuthService.user.subscribe(async (newuser: User | null) => {
 			user = newuser
+			if (user) {
+				currentUser.set(user)
+				console.log('MENU SET currentUser', user)
+			} else {
+				currentUser.set(null)
+			}
 			// console.log('got user:', user)
 		})
 		// const networkService = NetworkService.getInstance()
@@ -58,7 +74,9 @@
 			<h4 style="margin-top:0px;text-align:center;color:var(--ion-color-primary)">
 				<strong>Diet Tracker</strong>
 			</h4>
-			<p style="padding-bottom:5px;text-align:center;color:var(--ion-color-medium)">Track your diet across devices.</p>
+			<p style="padding-bottom:5px;text-align:center;color:var(--ion-color-medium)">
+				Track your diet across devices.
+			</p>
 			<ion-menu-toggle auto-hide="false">
 				<Login
 					providers={['google', 'facebook', 'twitter']}

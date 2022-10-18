@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import IonPage from "$ionic/svelte/components/IonPage.svelte";
 	import { checkmarkOutline } from 'ionicons/icons'
-	import SupabaseDataService from '$services/supabase.data.service'
-	import { goto } from '@roxi/routify'
 	import SupabaseAuthService from '$services/supabase.auth.service'
-	import type { User } from '@supabase/supabase-js'
-
-	const supabaseDataService = SupabaseDataService.getInstance()
+	import { goto } from '@roxi/routify'
+	import { currentUser } from '$services/user.store';
+	const supabaseAuthService = SupabaseAuthService.getInstance()
 
 	let days: any[]; // = cache || []
 	let settings: any = {
@@ -16,53 +14,31 @@
 			water_target: 8,
 		}
 	};
-	let user: User = null
-	let userSubscription: any
 
-	onDestroy(() => {
-		try {
-			userSubscription.unsubscribe()
-		} catch (err) {
-			console.error('error unsubscribing', err)
-		}
-	})
-
-
-	onMount(async () => {
-		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
-			user = newuser
-			//console.log('got user:', user)
-		})
-		const { data, error } = await supabaseDataService.getSettings();
-		console.log('*** data', data, error);
-		settings = data || {};
-		if (!settings.settings) {
-			settings.settings = {
+	const ionViewDidEnter = () => {
+		console.log('** ionViewDidEnter', $currentUser)
+		if ($currentUser?.user_metadata) {
+			settings = $currentUser?.user_metadata;
+		} else {
+			settings = {
 				daily_budget: 0,
 				target_weight: 0,
 				water_target: 8,
-			}
+			}			
 		}
-		if (typeof settings.settings.water_target === 'undefined') {
-			settings.settings.water_target = 8
-		}
-	})
+	};
+
 
 	const gotoDay = (id: string) => {
 		$goto(`/day/[id]`,{id})
 	}
 	const save = async () => {
-		if (!settings.user_id) {settings.user_id = user?.id || null}
-		if (!settings.settings) {settings.settings = {}}
-		if (!settings.settings.daily_budget) {settings.settings.daily_budget = 0}
-		if (!settings.settings.target_weight) {settings.settings.target_weight = 0}
-		console.log('calling saveSettings', settings)
-
-		const { data, error } = await supabaseDataService.saveSettings(settings);
+		console.log('save settings as', settings)
+		const { user, error } = await supabaseAuthService.saveSettings(settings);
 		if (error) {
 			console.log('save error', error)
 		} else {
-			console.log('save results', data, error)
+			console.log('save results', user, error)
 		}
 	}
 	function focusOnNumericInput(event) {
@@ -84,6 +60,7 @@
     }
 
 </script>
+<IonPage {ionViewDidEnter}>
 
 <ion-header translucent="true">
 	<ion-toolbar>
@@ -104,25 +81,25 @@
 		<ion-item>
 			<ion-label>Daily Budget</ion-label>
 			<ion-input type="number" class="short"
-				value={settings?.settings?.daily_budget} 
+				value={settings?.daily_budget} 
 				on:ionFocus={focusOnNumericInput}
-				on:ionChange={(e) => settings.settings.daily_budget = e.detail.value}>
+				on:ionChange={(e) => settings.daily_budget = e.detail.value}>
 			</ion-input>
 		</ion-item>
 		<ion-item>
 			<ion-label>Water Target</ion-label>
 			<ion-input type="number" class="short"
-				value={settings?.settings?.water_target} 
+				value={settings?.water_target} 
 				on:ionFocus={focusOnNumericInput}
-				on:ionChange={(e) => settings.settings.water_target = e.detail.value}>
+				on:ionChange={(e) => settings.water_target = e.detail.value}>
 			</ion-input>
 		</ion-item>
 		<ion-item>
 			<ion-label>Target Weight</ion-label>
 			<ion-input type="number" class="short"
-				value={settings?.settings?.target_weight} 
+				value={settings?.target_weight} 
 				on:ionFocus={focusOnNumericInput}
-				on:ionChange={(e) => settings.settings.target_weight = e.detail.value}>
+				on:ionChange={(e) => settings.target_weight = e.detail.value}>
 			</ion-input>
 		</ion-item>
 		<!-- <ion-item>
@@ -130,9 +107,8 @@
 			<ion-datetime display-format="MMM DD, YYYY" value={settings?.target_date} on:ionChange={(e) => settings.target_date = e.detail.value}></ion-datetime>
 		</ion-item> -->
 	</ion-list>
-	<!-- <pre>{JSON.stringify(settings,null,2)}</pre> -->
 </ion-content>
-
+</IonPage>
 <style>
 	ion-label {
 		display: inline-block;

@@ -19,15 +19,12 @@
 	import { alert, showConfirm } from '$services/alert'
 	import SupabaseDataService from '$services/supabase.data.service'
 	const supabaseDataService = SupabaseDataService.getInstance()
-	import SupabaseAuthService from '$services/supabase.auth.service'
-	import type { User } from '@supabase/supabase-js'
+	import { currentUser } from '$services/user.store';
 
 	import { onDestroy, onMount } from 'svelte'
 	import SupabaseUtilityService from '$services/utility.functions.service'
 	const utils = SupabaseUtilityService.getInstance()
 
-	let user = null
-	let userSubscription: any
 	let settings: any = { daily_budget: 0, target_weight: 0 }
 
 	let id = $params.id
@@ -41,7 +38,7 @@
 		console.log('it is new')
 		day = {
 			id: supabaseDataService.gen_random_uuid(),
-			user_id: user?.id || null,
+			user_id: $currentUser?.id || null,
 			created_at: new Date().toISOString(),
 			date: new Date().toISOString().substring(0, 10),
 			food_log: { entries: [] },
@@ -62,13 +59,14 @@
 	}
 
 	onMount(async () => {
-		const { data, error } = await supabaseDataService.getSettings()
+		console.log('day onMount, $currentUser', $currentUser)
+		if (!$currentUser) {
+			$goto('/info')
+			return;
+		}
+		const { data, error } = await supabaseDataService.getSettings($currentUser?.id)
 		console.log('*** settings', data, error)
 		settings = data.settings || {}
-		userSubscription = SupabaseAuthService.user.subscribe((newuser: User | null) => {
-			user = newuser
-			//console.log('got user:', user)
-		})
 		if (id === 'new') {
 			const { data, error } = await supabaseDataService.getCurrentWeight()
 			if (error) console.error('getCurrentWeight error', error)
@@ -78,8 +76,7 @@
 
 	onDestroy(() => {
 		try {
-			recordset.unsubscribe()
-			userSubscription.unsubscribe()
+			if (recordset) recordset.unsubscribe()
 		} catch (err) {
 			console.error('error unsubscribing', err)
 		}
