@@ -416,6 +416,7 @@
 				</ion-col>
 			</ion-row>
 		</ion-grid>
+		<br/>
 	</ion-footer>
 </IonPage>
 
