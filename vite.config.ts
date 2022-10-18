@@ -34,6 +34,11 @@ const pwaManifest = {
       "type": "image/png"
     },
     {
+      "src": "assets/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
       "src": "assets/icons/icon-168.png",
       "sizes": "168x168",
       "type": "image/png"
