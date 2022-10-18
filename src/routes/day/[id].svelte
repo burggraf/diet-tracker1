@@ -1,7 +1,5 @@
 <script lang="ts">
-	/**
-	 this version looks up each individual widget instead of using the widgets recordset
-	*/
+	import IonPage from '$ionic/svelte/components/IonPage.svelte'
 	import { params, goto } from '@roxi/routify'
 	import { toast } from '$services/toast'
 	import {
@@ -19,7 +17,7 @@
 	import { alert, showConfirm } from '$services/alert'
 	import SupabaseDataService from '$services/supabase.data.service'
 	const supabaseDataService = SupabaseDataService.getInstance()
-	import { currentUser } from '$services/user.store';
+	import { currentUser } from '$services/user.store'
 
 	import { onDestroy, onMount } from 'svelte'
 	import SupabaseUtilityService from '$services/utility.functions.service'
@@ -60,20 +58,20 @@
 		// console.log('day onMount, $currentUser', $currentUser)
 		if (!$currentUser) {
 			$goto('/info')
-			return;
+			return
 		}
 		if (id === 'new') {
 			try {
 				const { data, error } = await supabaseDataService.getCurrentWeight()
 				if (error) {
-					console.error('getCurrentWeight error', error);
-					day.weight = 0;
+					console.error('getCurrentWeight error', error)
+					day.weight = 0
 				} else {
-					day.weight = data.weight;
+					day.weight = data.weight
 				}
 			} catch (ex) {
-				console.log('exception', ex);
-				day.weight = 0;
+				console.log('exception', ex)
+				day.weight = 0
 			}
 		}
 	})
@@ -248,8 +246,8 @@
 		}
 	}
 	function focusOnNumericInput(event) {
-		console.log('event.target.scrollTop', event.target.scrollTop)
-		event.target.scrollTop = 0;
+		// console.log('event.target.scrollTop', event.target.scrollTop)
+		event.target.scrollTop = 0
 		try {
 			if ((parseFloat(event.target.value!) || 0) === 0) {
 				event.target.value = ''
@@ -257,232 +255,169 @@
 		} catch (err) {
 			console.error('error clearing zero value', err)
 		}
-		// put cursor at end of input
-		// event.target.getInputElement().then((input) => {
-		// 	console.log('input', input)
-		// 	// set cursor to end of input
-		// 	input.type = 'text'
-		// 	input.setSelectionRange(input.value.length, input.value.length)
-		// 	input.type = 'number'
-		// })
 	}
 	function blurOnNumericInput(event) {
-		save();
-		setTimeout(()=>{
-			window.scrollTo({ top: 0, behavior: 'smooth' });
-		},1000)
-		// scroll to top of page
-		// const x = document.getElementsByTagName('ion-content')[0];//.scrollToTop(1000);
-		// x.scrollTop = 0;
-		// console.log('x', x)
+		save()
 	}
 </script>
 
-<ion-header translucent="true">
-	<ion-toolbar>
-		<ion-buttons slot="start">
-			<ion-button
-				on:click={() => {
-					//history.back()
-					// window.location.href = '/days'
-					goBack()
-				}}
-			>
-				<ion-icon slot="icon-only" icon={chevronBackOutline} />
-			</ion-button>
-		</ion-buttons>
-		<ion-title>Day</ion-title>
-		<ion-buttons slot="end">
-			{#if mode === 'view'}
-				<ion-button on:click={delete_day}>
-					<ion-icon slot="icon-only" icon={trashOutline} />
-				</ion-button>
+<IonPage>
+	<ion-header translucent="true">
+		<ion-toolbar>
+			<ion-buttons slot="start">
 				<ion-button
 					on:click={() => {
-						mode = 'edit'
+						//history.back()
+						// window.location.href = '/days'
+						goBack()
 					}}
 				>
-					<ion-icon slot="icon-only" icon={createOutline} />
+					<ion-icon slot="icon-only" icon={chevronBackOutline} />
 				</ion-button>
-			{/if}
-			{#if mode === 'edit'}
-				<ion-button
-					on:click={() => {
-						mode = 'view'
-						if (id === 'add') goBack() // window.location.href = '/TestData';
-						// else day = cache || {}
-					}}
-				>
-					<ion-icon slot="icon-only" icon={closeOutline} />
-				</ion-button>
-				<ion-button
-					on:click={() => {
-						save()
-					}}
-				>
-					<ion-icon slot="icon-only" icon={checkmarkOutline} />
-				</ion-button>
-			{/if}
-		</ion-buttons>
-	</ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-	{#if day}
-		<ion-card>
-			<ion-card-header>
-				<ion-card-subtitle>
-					<ion-grid>
-						<ion-row>
-							<ion-col style="text-align: left; font-weight: bold;">
-								Total: {(day?.food_total || 0).toFixed(2)}
-							</ion-col>
-							<ion-col style="text-align: right; font-weight: bold;">
-								{#if $currentUser?.user_metadata?.daily_budget}
-								Left: {($currentUser?.user_metadata?.daily_budget - day?.food_total || 0).toFixed(2)}
-								{/if}
-							</ion-col>
-						</ion-row>
-					</ion-grid>
-				</ion-card-subtitle>
-				<ion-card-title style="text-align: center;">
-					{#if mode === 'view'}
-						{new Date(
-							new Date(day?.date).getTime() + new Date(day?.date).getTimezoneOffset() * 60000
-						).toDateString()}
-						<!-- {day?.date} -->
-					{/if}
-					{#if mode === 'edit'}
-						<ion-label>Date:</ion-label><ion-input
-							value={day.date}
-							on:ionChange={handler}
-							required
-							name="date"
-							type="text"
-						/>
-					{/if}
-				</ion-card-title>
-			</ion-card-header>
-
-			<ion-card-content>
-				{#if mode === 'view'}{day?.notes}{/if}
-				{#if mode === 'edit'}
-					<ion-label>Notes:</ion-label><ion-input
-						value={day.notes}
-						on:ionChange={handler}
-						required
-						name="notes"
-						type="text"
-					/>
-				{/if}
-				<br />
-				<ion-list lines="full">
-					<ion-reorder-group
-						id="food_log_group"
-						disabled="false"
-						on:ionItemReorder={reorder_food_log}
+			</ion-buttons>
+			<ion-title>
+				{new Date(
+					new Date(day?.date).getTime() + new Date(day?.date).getTimezoneOffset() * 60000
+				).toDateString()}
+			</ion-title>
+			<ion-buttons slot="end">
+				{#if mode === 'view'}
+					<ion-button on:click={delete_day}>
+						<ion-icon slot="icon-only" icon={trashOutline} />
+					</ion-button>
+					<ion-button
+						on:click={() => {
+							mode = 'edit'
+						}}
 					>
-						{#if day?.food_log?.entries}
-							{#each day?.food_log?.entries as entry, index}
-								<ion-item
-									on:click={() => {
-										edit_food_log_entry(index)
-									}}
-								>
-									<ion-reorder slot="start" />
-									<div>
-										{entry?.title}<br />
-										<span class="description">{entry?.desc || ''}&nbsp;</span>
-									</div>
-									<!-- <ion-grid>
-										<ion-row>
-											<ion-col style="font-weight: bold;">{entry?.title}</ion-col>
-										</ion-row>
-										<ion-row>
-											<ion-col>{entry?.desc}</ion-col>											
-										</ion-row>
-									</ion-grid>										 -->
-									<ion-note slot="end" class="right">
-										<div>
-											{(entry?.amt || 0).toFixed(2)}<br />
-											<span class="description">&nbsp;{entry?.cat || ''}</span>
-										</div>
-										<!-- <ion-grid>
-											<ion-row>
-												<ion-col style="text-align: right; font-weight: bold;">{(entry?.amt || 0).toFixed(2)}</ion-col>
-											</ion-row>
-											<ion-row>
-												<ion-col  style="text-align: right;">{entry?.cat || ''}</ion-col>
-											</ion-row>
-										</ion-grid>										 -->
-									</ion-note>
-								</ion-item>
-							{/each}
-						{/if}
-					</ion-reorder-group>
-
-					<ion-item on:click={add_food_log_entry}>
-						<ion-icon icon={addCircleOutline} slot="start" />
-						new food entry
-					</ion-item>
-				</ion-list>
-
-				<br />
-				<br />
-				created: {new Date(day?.created_at).toLocaleDateString()}
-				{new Date(day?.created_at).toLocaleTimeString()}<br />
-				<br />
-			</ion-card-content>
-		</ion-card>
-		<ion-footer>
-			<ion-card>
-				<ion-card-content>
-					<ion-grid>
-						<ion-row>
-							<ion-col>
-								<div class="left">
-									<div class="footertitle">Weight</div>
-									<div class="footertitle">
-										<ion-input
-										on:ionChange={handleNumberValue}
-										on:ionFocus={focusOnNumericInput}
-										on:ionBlur={blurOnNumericInput}
-										name="weight"
-										class="weightBox"
-										type="decimal"
-										inputmode="decimal"
-										value={day?.weight}
-									/>
-									</div>
+						<ion-icon slot="icon-only" icon={createOutline} />
+					</ion-button>
+				{/if}
+				{#if mode === 'edit'}
+					<ion-button
+						on:click={() => {
+							mode = 'view'
+							if (id === 'add') goBack() // window.location.href = '/TestData';
+							// else day = cache || {}
+						}}
+					>
+						<ion-icon slot="icon-only" icon={closeOutline} />
+					</ion-button>
+					<ion-button
+						on:click={() => {
+							save()
+						}}
+					>
+						<ion-icon slot="icon-only" icon={checkmarkOutline} />
+					</ion-button>
+				{/if}
+			</ion-buttons>
+		</ion-toolbar>
+	</ion-header>
+	<ion-content class="ion-padding">
+		<ion-grid>
+			<ion-row>
+				<ion-col style="text-align: left; font-weight: bold;">
+					Total: {(day?.food_total || 0).toFixed(2)}
+				</ion-col>
+				<ion-col style="text-align: right; font-weight: bold;">
+					{#if $currentUser?.user_metadata?.daily_budget}
+						Left: {($currentUser?.user_metadata?.daily_budget - day?.food_total || 0).toFixed(2)}
+					{/if}
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+		{#if mode === 'edit'}
+			<div style="text-align: center;">
+				<ion-label>Date:</ion-label><ion-input
+					value={day.date}
+					on:ionChange={handler}
+					required
+					name="date"
+					type="text"
+				/>
+			</div>
+		{/if}
+		{#if mode === 'view' && day?.notes}<div class="ion-padding">{day?.notes}</div>{/if}
+		{#if mode === 'edit'}
+			<ion-label>Notes:</ion-label><ion-input
+				value={day.notes}
+				on:ionChange={handler}
+				required
+				name="notes"
+				type="text"
+			/>
+		{/if}
+		<ion-list lines="full">
+			<ion-reorder-group id="food_log_group" disabled="false" on:ionItemReorder={reorder_food_log}>
+				{#if day?.food_log?.entries}
+					{#each day?.food_log?.entries as entry, index}
+						<ion-item
+							on:click={() => {
+								edit_food_log_entry(index)
+							}}
+						>
+							<ion-reorder slot="start" />
+							<div>
+								{entry?.title}<br />
+								<span class="description">{entry?.desc || ''}&nbsp;</span>
+							</div>
+							<ion-note slot="end" class="right">
+								<div>
+									{(entry?.amt || 0).toFixed(2)}<br />
+									<span class="description">&nbsp;{entry?.cat || ''}</span>
 								</div>
-							</ion-col>
-							<ion-col>
-								<div class="right">
-									<div class="footertitle">Water</div>
-									<div class="footertitle together">
-										<ion-icon
-											color={day.water_total <= 0 ? 'medium' : 'dark'}
-											icon={removeCircleOutline}
-											size="large"
-											on:click={downWater}
-										/>
-										<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
-										<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
-									</div>
-								</div>
-							</ion-col>
-						</ion-row>
-					</ion-grid>
-				</ion-card-content>
-			</ion-card>
-			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		</ion-footer>
-	{/if}
-	<!-- day?.date: {day?.date}<br /> -->
-	<!-- <pre>{JSON.stringify(day.water_log.entries,null,2)}</pre> -->
-	<!-- <pre>{JSON.stringify(day,null,2)}</pre> -->
-</ion-content>
+							</ion-note>
+						</ion-item>
+					{/each}
+				{/if}
+			</ion-reorder-group>
+
+			<ion-item lines="none" on:click={add_food_log_entry}>
+				<ion-icon icon={addCircleOutline} slot="start" />
+				new food entry
+			</ion-item>
+		</ion-list>
+	</ion-content>
+	<ion-footer>
+		<ion-grid>
+			<ion-row>
+				<ion-col>
+					<div class="left">
+						<div class="footertitle">Weight</div>
+						<div class="footertitle">
+							<ion-input
+								on:ionChange={handleNumberValue}
+								on:ionFocus={focusOnNumericInput}
+								on:ionBlur={blurOnNumericInput}
+								name="weight"
+								class="weightBox"
+								type="decimal"
+								inputmode="decimal"
+								value={day?.weight}
+							/>
+						</div>
+					</div>
+				</ion-col>
+				<ion-col>
+					<div class="right">
+						<div class="footertitle">Water</div>
+						<div class="footertitle together">
+							<ion-icon
+								color={day.water_total <= 0 ? 'medium' : 'dark'}
+								icon={removeCircleOutline}
+								size="large"
+								on:click={downWater}
+							/>
+							<span class="water-digits">&nbsp;{day.water_total || 0}&nbsp;</span>
+							<ion-icon icon={addCircleOutline} size="large" on:click={upWater} />
+						</div>
+					</div>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+	</ion-footer>
+</IonPage>
 
 <style>
 	.water-digits {
