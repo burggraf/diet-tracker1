@@ -40,7 +40,7 @@
 		// { title: 'Current User', url: '/TestAuth', icon: person, requireLogin: true },
 		{ title: 'Calendar', url: '/calendar', icon: calendarOutline, requireLogin: true },
 		{ title: 'Settings', url: '/settings', icon: settingsOutline, requireLogin: true },
-		{ title: 'Info', url: '/', icon: informationCircle, requireLogin: false },
+		{ title: 'Info', url: '/info', icon: informationCircle, requireLogin: false },
 	]
 	const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']
 
