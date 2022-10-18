@@ -17,15 +17,17 @@
 
 	const ionViewDidEnter = () => {
 		console.log('** ionViewDidEnter', $currentUser)
-		if ($currentUser?.user_metadata) {
-			settings = $currentUser?.user_metadata;
-		} else {
-			settings = {
+		settings = {
 				daily_budget: 0,
 				target_weight: 0,
 				water_target: 8,
-			}			
-		}
+			}		
+		if ($currentUser?.user_metadata?.daily_budget) 
+			settings.daily_budget = $currentUser?.user_metadata?.daily_budget;
+		if ($currentUser?.user_metadata?.target_weight) 
+			settings.target_weight = $currentUser?.user_metadata?.target_weight;
+		if ($currentUser?.user_metadata?.water_target)
+			settings.water_target = $currentUser?.user_metadata?.water_target;
 	};
 
 

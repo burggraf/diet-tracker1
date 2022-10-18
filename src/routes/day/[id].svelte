@@ -63,9 +63,18 @@
 			return;
 		}
 		if (id === 'new') {
-			const { data, error } = await supabaseDataService.getCurrentWeight()
-			if (error) console.error('getCurrentWeight error', error)
-			else day.weight = data.weight;
+			try {
+				const { data, error } = await supabaseDataService.getCurrentWeight()
+				if (error) {
+					console.error('getCurrentWeight error', error);
+					day.weight = 0;
+				} else {
+					day.weight = data.weight;
+				}
+			} catch (ex) {
+				console.log('exception', ex);
+				day.weight = 0;
+			}
 		}
 	})
 
