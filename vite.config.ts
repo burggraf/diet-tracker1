@@ -8,8 +8,10 @@ import { readFileSync } from 'fs'
 const pwaManifest = {
   name: 'Diet Tracker',
   short_name: 'Diet Tracker',
+  start_url: 'index.html',
   description: 'Diet Tracker: Track your diet and exercise across multiple devices',
-  theme_color: '#000000',
+  background_color: '#387ef5',
+  theme_color: '#387ef5',
   icons: [
     {
       "src": "assets/icons/icon-32.png",
