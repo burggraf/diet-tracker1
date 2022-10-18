@@ -30,6 +30,7 @@
 		<Login
 			providers={['google', 'facebook', 'twitter']}
 			onSignOut={() => {
+                localStorage.clear();
 				window.location.href = '/'
 			}}
 			profileFunction={() => {
