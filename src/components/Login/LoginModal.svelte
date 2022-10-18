@@ -126,7 +126,7 @@
 </script>
 
 <svelte:head>
-  <title>Ionic Companion - Modal Extra</title>
+  <title>Diet Tracker</title>
 </svelte:head>
 <ion-header translucent="true">
   <ion-toolbar>
