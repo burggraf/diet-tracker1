@@ -57,7 +57,7 @@
 	}
 
 	onMount(async () => {
-		console.log('day onMount, $currentUser', $currentUser)
+		// console.log('day onMount, $currentUser', $currentUser)
 		if (!$currentUser) {
 			$goto('/info')
 			return;
@@ -100,13 +100,13 @@
 	}
 	const save = async () => {
 		// validate here...
-		console.log('save the day', day)
-		console.log('id is currently', id)
+		// console.log('save the day', day)
+		// console.log('id is currently', id)
 		let savingNewDay = false
 		if (id === 'new') savingNewDay = true
 
 		if (!day.user_id) {
-			day.user_id = user.id
+			day.user_id = $currentUser.id
 		}
 		try {
 			day.food_total = 0
@@ -248,6 +248,8 @@
 		}
 	}
 	function focusOnNumericInput(event) {
+		console.log('event.target.scrollTop', event.target.scrollTop)
+		event.target.scrollTop = 0;
 		try {
 			if ((parseFloat(event.target.value!) || 0) === 0) {
 				event.target.value = ''
@@ -256,16 +258,23 @@
 			console.error('error clearing zero value', err)
 		}
 		// put cursor at end of input
-		event.target.getInputElement().then((input) => {
-			console.log('input', input)
-			// set cursor to end of input
-			input.type = 'text'
-			input.setSelectionRange(input.value.length, input.value.length)
-			input.type = 'number'
-		})
+		// event.target.getInputElement().then((input) => {
+		// 	console.log('input', input)
+		// 	// set cursor to end of input
+		// 	input.type = 'text'
+		// 	input.setSelectionRange(input.value.length, input.value.length)
+		// 	input.type = 'number'
+		// })
 	}
 	function blurOnNumericInput(event) {
 		save();
+		setTimeout(()=>{
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		},1000)
+		// scroll to top of page
+		// const x = document.getElementsByTagName('ion-content')[0];//.scrollToTop(1000);
+		// x.scrollTop = 0;
+		// console.log('x', x)
 	}
 </script>
 
@@ -439,7 +448,8 @@
 										on:ionBlur={blurOnNumericInput}
 										name="weight"
 										class="weightBox"
-										type="number"
+										type="decimal"
+										inputmode="decimal"
 										value={day?.weight}
 									/>
 									</div>
@@ -464,6 +474,9 @@
 					</ion-grid>
 				</ion-card-content>
 			</ion-card>
+			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+			<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 		</ion-footer>
 	{/if}
 	<!-- day?.date: {day?.date}<br /> -->
@@ -474,7 +487,8 @@
 <style>
 	.water-digits {
 		/* font-size: 2em; */
-		font-weight: bold;
+		/* font-weight: bold; */
+		font-size: 2em;
 		/* font-family: 'Courier New', Courier, monospace; */
 	}
 	.water-line {
@@ -503,8 +517,8 @@
 	}
 	.weightBox {
 		height: 50px;
-		width: 90px;
-		max-width: 90px;
+		width: 100px;
+		max-width: 100px;
 		border: 1px solid rgb(212, 212, 212);
 		background-color: var(--ion-background-color) !important;
 		border-radius: 5px;
