@@ -329,8 +329,10 @@
 		</ion-toolbar>
 	</ion-header>
 	<ion-content class="ion-padding">
-
-		<ion-datetime id="datepicker" class="hidden" on:click={handleDate}></ion-datetime>
+		<!-- center this content -->
+		<div class="centered">
+			<ion-datetime id="datepicker" class="hidden" on:click={handleDate}></ion-datetime>
+		</div>
 
 		<ion-grid>
 			<ion-row>
@@ -431,6 +433,11 @@
 </IonPage>
 
 <style>
+	.centered {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 	.hidden {
 		display: none;
 	}
