@@ -93,7 +93,7 @@
 		const { data } = await openFoodSearchModalController.onWillDismiss();
 		if (data?.data !== null) {	
             console.log('got data', data.data)
-            entry.title = data.data.name;
+            entry.title = data.data.title;
             entry.cps = data.data.calories;
             entry.qty = 1;
             entry.amt = entry.cps * entry.qty;
