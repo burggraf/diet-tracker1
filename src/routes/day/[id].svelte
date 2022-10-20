@@ -24,7 +24,7 @@
 	const utils = SupabaseUtilityService.getInstance()
 
 	let id = $params.id
-	let mode = 'view'
+	// let mode = 'view'
 
 	let day: any = {} // = cache || {}
 	console.log('*** id', id)
@@ -45,7 +45,7 @@
 			weight: 0,
 			notes: '',
 		}
-		mode = 'edit'
+		// mode = 'edit'
 		console.log('*** new day', day)
 	} else {
 		recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
@@ -96,12 +96,14 @@
 			day[event.target.name] = event.target.value
 		}
 	}
+	const handleDate = (event) => {
+		day.date = new Date(event.target.value);
+		// day.date = event.target.value
+	}
 	const save = async () => {
 		// validate here...
 		// console.log('save the day', day)
 		// console.log('id is currently', id)
-		let savingNewDay = false
-		if (id === 'new') savingNewDay = true
 
 		if (!day.user_id) {
 			day.user_id = $currentUser.id
@@ -130,12 +132,8 @@
 			}
 		} else {
 			id = day.id
-			mode = 'view'
+			// mode = 'view'
 			// supabaseDataService.updateDataSubscription('day', { id })
-		}
-		if (savingNewDay) {
-			console.log('*** day is new, redirect to', '/day/' + day.id)
-			$goto('/day/' + day.id)
 		}
 	}
 	const delete_day = async () => {
@@ -256,8 +254,22 @@
 			console.error('error clearing zero value', err)
 		}
 	}
-	function blurOnNumericInput(event) {
+	function saveOnBlur(event) {
+		console.log('*** saveOnBlur', event.target.value)
 		save()
+	}
+	function toggleDatePicker() {
+		console.log('** toggleDatePicker');
+		const el = document.getElementById('datepicker');
+		if (id == 'new') {
+			if (el) {
+				el.classList.toggle('hidden');
+			}
+		} else {
+			if (!el.classList.contains('hidden')) {
+				el.classList.add('hidden');
+			}
+		}
 	}
 </script>
 
@@ -275,25 +287,27 @@
 					<ion-icon slot="icon-only" icon={chevronBackOutline} />
 				</ion-button>
 			</ion-buttons>
-			<ion-title>
+			<ion-title on:click={toggleDatePicker}>
 				{new Date(
 					new Date(day?.date).getTime() + new Date(day?.date).getTimezoneOffset() * 60000
 				).toDateString()}
 			</ion-title>
 			<ion-buttons slot="end">
-				{#if mode === 'view'}
+				<!-- {#if mode === 'view'} -->
+				{#if id !== 'new'}
 					<ion-button on:click={delete_day}>
 						<ion-icon slot="icon-only" icon={trashOutline} />
 					</ion-button>
-					<ion-button
+				{/if}
+					<!-- <ion-button
 						on:click={() => {
 							mode = 'edit'
 						}}
 					>
 						<ion-icon slot="icon-only" icon={createOutline} />
-					</ion-button>
-				{/if}
-				{#if mode === 'edit'}
+					</ion-button> -->
+				<!-- {/if} -->
+				<!-- {#if mode === 'edit'}
 					<ion-button
 						on:click={() => {
 							mode = 'view'
@@ -310,11 +324,14 @@
 					>
 						<ion-icon slot="icon-only" icon={checkmarkOutline} />
 					</ion-button>
-				{/if}
+				{/if} -->
 			</ion-buttons>
 		</ion-toolbar>
 	</ion-header>
 	<ion-content class="ion-padding">
+
+		<ion-datetime id="datepicker" class="hidden" on:click={handleDate}></ion-datetime>
+
 		<ion-grid>
 			<ion-row>
 				<ion-col style="text-align: left; font-weight: bold;">
@@ -327,27 +344,6 @@
 				</ion-col>
 			</ion-row>
 		</ion-grid>
-		{#if mode === 'edit'}
-			<div style="text-align: center;">
-				<ion-label>Date:</ion-label><ion-input
-					value={day.date}
-					on:ionChange={handler}
-					required
-					name="date"
-					type="text"
-				/>
-			</div>
-		{/if}
-		{#if mode === 'view' && day?.notes}<div class="ion-padding">{day?.notes}</div>{/if}
-		{#if mode === 'edit'}
-			<ion-label>Notes:</ion-label><ion-input
-				value={day.notes}
-				on:ionChange={handler}
-				required
-				name="notes"
-				type="text"
-			/>
-		{/if}
 		<ion-list lines="full">
 			<ion-reorder-group id="food_log_group" disabled="false" on:ionItemReorder={reorder_food_log}>
 				{#if day?.food_log?.entries}
@@ -378,6 +374,20 @@
 				new food entry
 			</ion-item>
 		</ion-list>
+		<!-- {#if mode === 'view' && day?.notes}<div class="ion-padding">{day?.notes}</div>{/if} -->
+		<div class="ion-padding">
+			<ion-input
+			class="notes-box"
+			value={day?.notes}
+			on:ionChange={handler}
+			on:ionBlur={saveOnBlur}
+			required
+			name="notes"
+			type="text"
+			placeholder="notes"
+			/>				
+		</div>
+
 	</ion-content>
 	<ion-footer>
 		<ion-grid>
@@ -389,7 +399,7 @@
 							<ion-input
 								on:ionChange={handleNumberValue}
 								on:ionFocus={focusOnNumericInput}
-								on:ionBlur={blurOnNumericInput}
+								on:ionBlur={saveOnBlur}
 								name="weight"
 								class="weightBox"
 								type="decimal"
@@ -421,6 +431,9 @@
 </IonPage>
 
 <style>
+	.hidden {
+		display: none;
+	}
 	.water-digits {
 		/* font-size: 2em; */
 		/* font-weight: bold; */
@@ -443,6 +456,10 @@
 		width: 60%;
 		border: 1px solid;
 		display: inline-block;
+	}
+	.notes-box {
+		width: 100% !important;
+		border: none;
 	}
 	.description {
 		color: gray;
