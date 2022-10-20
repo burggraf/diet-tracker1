@@ -421,6 +421,17 @@ export default class SupabaseDataService {
     }
     return { user, error };
   }
+  public search_food_log = async (s: string) => {
+    const { data, error } = 
+    await supabase.rpc('search_food_log', { string: s});
+    return { data, error };  
+  }
+  public search_internet = async (s: string) => {
+    const data = [];
+    const error = null;
+    return { data, error };  
+  }
+
 }
 
 const supabaseDataService = SupabaseDataService.getInstance()

@@ -10,4 +10,5 @@ CREATE OR REPLACE FUNCTION "public"."search_food_log"(string text)
   from days
   ) as days_query
   where title ilike '%' || string || '%'
+  order by title
 $$;
