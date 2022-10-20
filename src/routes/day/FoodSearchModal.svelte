@@ -75,13 +75,13 @@
     <ion-list  id="thelist" style="overflow-y: scroll !important; height: 500px;">
         {#each filteredFood as item}
             <ion-item on:click={() => {save(item)}}>
-                <ion-label>
-                    <h2>{item.name}</h2>
-                </ion-label>
+                <ion-text>
+                    <p style="overflow: visible;">{item.name}</p>
+                </ion-text>
                 <!-- <ion-note slot="end">{item.calories}</ion-note> -->
                 <ion-label slot="end">
                     <h2 style="text-align: right;">{item.calories}</h2>
-                    <p style="text-align: right;">{item.portion}</p>
+                    <p style="text-align: right;">{item.desc}</p>
                 </ion-label>
             </ion-item>
         {/each}
