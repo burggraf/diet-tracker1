@@ -63,8 +63,8 @@
 					} else {
 						filteredFood = data
 					}
-					console.log('data', data)
-					console.log('error', error)
+					// console.log('data', data)
+					// console.log('error', error)
 				} else {
 					filteredFood = []
 				}
