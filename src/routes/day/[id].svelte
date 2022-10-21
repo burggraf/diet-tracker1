@@ -57,7 +57,7 @@
 				if (error) {
 					console.log('getNextFreeDay error', error)
 				} else {
-					id = data.next_free_day;
+					id = data;
 					day = {
 						id: supabaseDataService.gen_random_uuid(),
 						user_id: $currentUser?.id || null,
@@ -72,7 +72,7 @@
 						notes: '',
 					}
 				}
-			} else if (id.length === 10) {
+			}} else if (id.length === 10) {
 			// new specific date sent in url
 			day = {
 				id: supabaseDataService.gen_random_uuid(),
@@ -88,7 +88,7 @@
 				notes: '',
 			}
 			id = day.id
-		}} else {
+		} else {
 			recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
 				day = rec
 				console.log('*** day', day)
@@ -302,9 +302,9 @@
 		save()
 	}
 	function toggleDatePicker() {
-		console.log('** toggleDatePicker')
+		console.log('** toggleDatePicker, id:', id)
 		const el = document.getElementById('datepicker')
-		if (id == 'new') {
+		if (id == 'new' || id.length === 10) {
 			if (el) {
 				el.classList.toggle('hidden')
 			}
