@@ -51,6 +51,25 @@
 		if (recordset) recordset.unsubscribe()
 		days = []
 	}
+	function toggleDatePicker() {
+		console.log('** toggleDatePicker');
+		const el = document.getElementById('datepicker');
+		if (el) {
+			el.classList.toggle('hidden');
+		}
+	}
+	const handleDate = async (event) => {
+		const theDate = new Date(event.target.value);
+		const { data, error } = await supabaseDataService.getDayId(theDate.toISOString().substring(0,10));
+		if (data && data.id) {
+			gotoDay(data.id);
+		} else {
+			//console.log('** handleDate', data, error);
+			gotoDay(theDate.toISOString().substring(0,10));
+		}
+		// day.date = event.target.value
+	}
+
 </script>
 
 <IonPage {ionViewDidEnter} {ionViewWillLeave}>
@@ -59,7 +78,7 @@
 			<ion-buttons slot="start">
 				<ion-menu-button />
 			</ion-buttons>
-			<ion-title>Calendar</ion-title>
+			<ion-title on:click={toggleDatePicker}>Calendar</ion-title>
 			<ion-buttons slot="end">
 				<ion-button on:click={() => gotoDay('new')}>
 					<ion-icon slot="icon-only" icon={addOutline} />
@@ -69,6 +88,9 @@
 	</ion-header>
 
 	<ion-content class="ion-padding">
+		<div class="centered">
+			<ion-datetime id="datepicker" class="hidden" on:click={handleDate}></ion-datetime>
+		</div>
 		<ion-list>
 			{#if days && days.length}
 				{#each days as day}
@@ -106,5 +128,13 @@
 	}
 	.notToday {
 		font-weight: normal;
+	}
+	.centered {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.hidden {
+		display: none;
 	}
 </style>

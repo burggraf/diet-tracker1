@@ -12,3 +12,11 @@ CREATE OR REPLACE FUNCTION "public"."search_food_log"(string text)
   where title ilike '%' || string || '%'
   order by title
 $$;
+
+
+DROP FUNCTION IF EXISTS "public"."next_free_day";
+CREATE OR REPLACE FUNCTION "public"."next_free_day"()
+  RETURNS text LANGUAGE sql AS $$
+  select substring(cast((max(date) + INTERVAL '1 days') as text),1,10) as next_free_day from days
+$$;
+

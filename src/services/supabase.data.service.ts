@@ -383,6 +383,24 @@ export default class SupabaseDataService {
     return { data, error };  
   }
 
+  public async getDayId(date: string) {
+    if (!this.isConnected()) { await this.connect() }
+    const { data, error } =
+    await supabase.from('days')
+    .select('id')
+    .eq('date', date.substring(0,10))
+    .limit(1)
+    .single(); // return a single object (not an array)
+    return { data, error };
+  }
+  public async getNextFreeDay() {
+    //next_free_day
+    if (!this.isConnected()) { await this.connect() }
+    const { data, error } = 
+    await supabase.rpc('next_free_day');
+    return { data, error };
+  }
+
   public async getSettings(uid: string) {
     if (!this.isConnected()) { await this.connect() }
     console.log('### supabaseDataService.getSettings, uid:', uid);

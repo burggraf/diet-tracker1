@@ -30,29 +30,72 @@
 	console.log('*** id', id)
 	let recordset: any
 
-	if (id === 'new') {
-		console.log('it is new')
-		day = {
-			id: supabaseDataService.gen_random_uuid(),
-			user_id: $currentUser?.id || null,
-			created_at: new Date().toISOString(),
-			date: new Date().toISOString().substring(0, 10),
-			food_log: { entries: [] },
-			food_total: 0,
-			activity_log: { entries: [] },
-			water_log: { entries: [] },
-			water_total: 0,
-			weight: 0,
-			notes: '',
+	const init = async () => {
+		if (id === 'new') {
+			console.log('it is new')
+			day = {
+					id: supabaseDataService.gen_random_uuid(),
+					user_id: $currentUser?.id || null,
+					created_at: new Date().toISOString(),
+					date: new Date().toISOString().substring(0, 10),
+					food_log: { entries: [] },
+					food_total: 0,
+					activity_log: { entries: [] },
+					water_log: { entries: [] },
+					water_total: 0,
+					weight: 0,
+					notes: '',
+				}
+
+			// do we have an entry for today already?
+			const { data, error } = await supabaseDataService.getDayId(
+				new Date().toISOString().substring(0, 10)
+			)
+			if (data && data.id) {
+				const { data, error } = await supabaseDataService.getNextFreeDay()
+				console.log('getNextFreeDay', data, error)
+				if (error) {
+					console.log('getNextFreeDay error', error)
+				} else {
+					id = data.next_free_day;
+					day = {
+						id: supabaseDataService.gen_random_uuid(),
+						user_id: $currentUser?.id || null,
+						created_at: new Date().toISOString(),
+						date: new Date(data).toISOString().substring(0, 10),
+						food_log: { entries: [] },
+						food_total: 0,
+						activity_log: { entries: [] },
+						water_log: { entries: [] },
+						water_total: 0,
+						weight: 0,
+						notes: '',
+					}
+				}
+			} else if (id.length === 10) {
+			// new specific date sent in url
+			day = {
+				id: supabaseDataService.gen_random_uuid(),
+				user_id: $currentUser?.id || null,
+				created_at: new Date().toISOString(),
+				date: id,
+				food_log: { entries: [] },
+				food_total: 0,
+				activity_log: { entries: [] },
+				water_log: { entries: [] },
+				water_total: 0,
+				weight: 0,
+				notes: '',
+			}
+			id = day.id
+		}} else {
+			recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
+				day = rec
+				console.log('*** day', day)
+			})
 		}
-		// mode = 'edit'
-		console.log('*** new day', day)
-	} else {
-		recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
-			day = rec
-			console.log('*** day', day)
-		})
 	}
+	init();
 
 	onMount(async () => {
 		// console.log('day onMount, $currentUser', $currentUser)
@@ -97,7 +140,7 @@
 		}
 	}
 	const handleDate = (event) => {
-		day.date = new Date(event.target.value);
+		day.date = new Date(event.target.value)
 		// day.date = event.target.value
 	}
 	const save = async () => {
@@ -259,15 +302,15 @@
 		save()
 	}
 	function toggleDatePicker() {
-		console.log('** toggleDatePicker');
-		const el = document.getElementById('datepicker');
+		console.log('** toggleDatePicker')
+		const el = document.getElementById('datepicker')
 		if (id == 'new') {
 			if (el) {
-				el.classList.toggle('hidden');
+				el.classList.toggle('hidden')
 			}
 		} else {
 			if (!el.classList.contains('hidden')) {
-				el.classList.add('hidden');
+				el.classList.add('hidden')
 			}
 		}
 	}
@@ -299,7 +342,7 @@
 						<ion-icon slot="icon-only" icon={trashOutline} />
 					</ion-button>
 				{/if}
-					<!-- <ion-button
+				<!-- <ion-button
 						on:click={() => {
 							mode = 'edit'
 						}}
@@ -331,7 +374,7 @@
 	<ion-content class="ion-padding">
 		<!-- center this content -->
 		<div class="centered">
-			<ion-datetime id="datepicker" class="hidden" on:click={handleDate}></ion-datetime>
+			<ion-datetime id="datepicker" class="hidden" on:click={handleDate} />
 		</div>
 
 		<ion-grid>
@@ -379,17 +422,16 @@
 		<!-- {#if mode === 'view' && day?.notes}<div class="ion-padding">{day?.notes}</div>{/if} -->
 		<div class="ion-padding">
 			<ion-input
-			class="notes-box"
-			value={day?.notes}
-			on:ionChange={handler}
-			on:ionBlur={saveOnBlur}
-			required
-			name="notes"
-			type="text"
-			placeholder="notes"
-			/>				
+				class="notes-box"
+				value={day?.notes}
+				on:ionChange={handler}
+				on:ionBlur={saveOnBlur}
+				required
+				name="notes"
+				type="text"
+				placeholder="notes"
+			/>
 		</div>
-
 	</ion-content>
 	<ion-footer>
 		<ion-grid>
@@ -428,7 +470,7 @@
 				</ion-col>
 			</ion-row>
 		</ion-grid>
-		<br/>
+		<br />
 	</ion-footer>
 </IonPage>
 
