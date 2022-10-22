@@ -195,6 +195,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     on:ionFocus={focusOnNumericInput}
                                     name="cps"
                                     class="formInputBoxCentered"
+                                    inputmode="decimal"
                                     type="number" 
                                     value={entry.cps}>
                                 </ion-input>        
@@ -205,6 +206,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     on:ionFocus={focusOnNumericInput}
                                     name="qty"
                                     class="formInputBoxCentered"
+                                    inputmode="decimal"
                                     type="number" 
                                     value={entry.qty}>
                                 </ion-input>        
@@ -215,6 +217,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     on:ionFocus={focusOnNumericInput}
                                     name="amt"
                                     class="formInputBoxCentered"
+                                    inputmode="decimal"
                                     type="number" 
                                     value={entry.amt}>
                                 </ion-input>        
