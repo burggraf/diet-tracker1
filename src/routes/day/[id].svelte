@@ -208,7 +208,7 @@
 			desc: '',
 			cat: '',
 			cps: 0,
-			qty: 1,
+			qty: 1.0,
 			amt: 0,
 			created: new Date().toISOString(),
 		}

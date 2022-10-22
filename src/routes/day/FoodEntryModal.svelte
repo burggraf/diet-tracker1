@@ -95,7 +95,7 @@
             console.log('got data', data.data)
             entry.title = data.data.title;
             entry.cps = data.data.calories;
-            entry.qty = 1;
+            entry.qty = 1.0;
             entry.amt = entry.cps * entry.qty;
             entry.desc = data.data.portion;
 			return true;
