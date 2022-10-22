@@ -46,24 +46,16 @@
             entry['amt'] = (entry['cps'] * entry['qty']);
         }
     }
-    function focusOnNumericInput(event) {
-        try {
-            if ((parseFloat(event.target.value!) || 0) === 0) {
-                event.target.value = '';
-            }
-        } catch (err) {
-            console.error('error clearing zero value', err)
-        }
-        // put cursor at end of input
-        event.target.getInputElement().then((input) => {
-            console.log('input', input)
-            // set cursor to end of input
-            input.type = 'text';
-            input.setSelectionRange(input.value.length, input.value.length);
-            input.type = 'number';
-        })
-    }
-
+	function focusOnNumericInput(event) {
+		// console.log('event.target.scrollTop', event.target.scrollTop)
+		try {
+			if ((parseFloat(event.target.value!) || 0) === 0) {
+				event.target.value = ''
+			}
+		} catch (err) {
+			console.error('error clearing zero value', err)
+		}
+	}
 
     function save() {
         modalController.dismiss({ data: entry });
