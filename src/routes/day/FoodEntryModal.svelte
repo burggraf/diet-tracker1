@@ -196,7 +196,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     name="cps"
                                     class="formInputBoxCentered"
                                     inputmode="decimal"
-                                    type="number" 
+                                    type="decimal" 
                                     value={entry.cps}>
                                 </ion-input>        
                             </ion-col>
@@ -207,7 +207,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     name="qty"
                                     class="formInputBoxCentered"
                                     inputmode="decimal"
-                                    type="number" 
+                                    type="decimal" 
                                     value={entry.qty}>
                                 </ion-input>        
                             </ion-col>
@@ -218,7 +218,7 @@ day.food_log.entries[day.food_log.entries.length - 1].amt = 0 -->
                                     name="amt"
                                     class="formInputBoxCentered"
                                     inputmode="decimal"
-                                    type="number" 
+                                    type="decimal" 
                                     value={entry.amt}>
                                 </ion-input>        
                             </ion-col>
