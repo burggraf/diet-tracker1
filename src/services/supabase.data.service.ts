@@ -447,16 +447,28 @@ export default class SupabaseDataService {
   public search_internet = async (s: string) => {
     let data = [];
     let error = null;
+    let url = '';
+    let isupc = false;
+    // check if we have a barcode
+    if (s.match(/^[0-9]+$/)) {
+      url = 'https://us.openfoodfacts.org/api/v0/product/' + s.trim() + '.json';
+      isupc = true;
+    } else {
+      url = `https://us.openfoodfacts.org/cgi/search.pl?search_terms=${s}&search_simple=1&action=process&json=1&nutriment_0=energy-kcal&nutriment_compare_0=gt&nutriment_value_0=500&fields=code,product_name,nutriments,serving_size&sort_by=product_name`;
+    }
     try {
-      const url = `https://us.openfoodfacts.org/cgi/search.pl?search_terms=${s}&search_simple=1&action=process&json=1&nutriment_0=energy-kcal&nutriment_compare_0=gt&nutriment_value_0=500&fields=code,product_name,nutriments,serving_size&sort_by=product_name`;
       const response = await fetch(url);
       const json = await response.json();
+      console.log('response', response);
+      console.log('json', json);
       if (!response.ok) {
         console.error('** fetch ERROR **', response.statusText);
         error = response.statusText;
         return ({ data: null, error });
       }
-      
+      if (isupc) {
+        json.products = [json.product];
+      }
       if (json && json.products) {
         // console.log('json', json);
         for (let i = 0; i < json.products.length; i++) {
@@ -466,9 +478,15 @@ export default class SupabaseDataService {
             if (desc.length > 0) desc += ' - ';
             desc += `${Math.round(product.nutriments["energy-kcal_100g"])} cal/100g`;
           } 
+          let calories = product.nutriments['energy-kcal_serving'] || product.nutriments['energy-kcal'];
+          if (calories) {
+            calories = Math.round(calories);
+          } else {
+            calories = '???';
+          }    
           data.push({
             title: product.product_name,
-            calories: Math.round(product.nutriments['energy-kcal_serving'] || product.nutriments['energy-kcal']),
+            calories: calories,
             desc: desc
           })
         }
