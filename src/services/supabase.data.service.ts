@@ -400,6 +400,12 @@ export default class SupabaseDataService {
     await supabase.rpc('next_free_day');
     return { data, error };
   }
+  public getRPC = async (rpc_name: string, params: any = {}) => {
+    if (!this.isConnected()) { await this.connect() }
+    const { data, error } = 
+    await supabase.rpc(rpc_name, params);
+    return { data, error };
+  }
 
   public async getSettings(uid: string) {
     if (!this.isConnected()) { await this.connect() }

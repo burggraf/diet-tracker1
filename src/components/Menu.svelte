@@ -8,6 +8,7 @@
 		informationCircle,
 		calendarOutline,
 		settingsOutline,
+		barChartOutline
 	} from 'ionicons/icons'
 	import { onDestroy, onMount } from 'svelte'
 	import Login from '$components/Login/Login.svelte'
@@ -55,6 +56,7 @@
 	const appPages = [
 		// { title: 'Current User', url: '/TestAuth', icon: person, requireLogin: true },
 		{ title: 'Calendar', url: '/calendar', icon: calendarOutline, requireLogin: true },
+		{ title: 'Charts', url: '/chart', icon: barChartOutline, requireLogin: true },
 		{ title: 'Settings', url: '/settings', icon: settingsOutline, requireLogin: true },
 		{ title: 'Info', url: '/info', icon: informationCircle, requireLogin: false },
 	]

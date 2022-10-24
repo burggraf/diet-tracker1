@@ -1,0 +1,150 @@
+<script lang="ts">
+	import IonPage from '$ionic/svelte/components/IonPage.svelte'
+	import { currentUser } from '$services/user.store'
+	import { Chart, registerables } from 'chart.js'
+
+	import SupabaseDataService from '$services/supabase.data.service'
+  import A from './[...fallback].svelte'
+	const supabaseDataService = SupabaseDataService.getInstance()	
+	let chart_source = 'get_weights';
+	let chart_label = 'Weight';
+	let my_chart: any;
+	const ionViewDidEnter = async () => {
+		createChart(chart_source, '2022-10-01', '2022-10-31', chart_label)
+		// createChart('get_calorie_totals', '2022-10-01', '2022-10-31', 'Calorie Totals')
+	}
+	const createChart = async (data_source: string, start_date: string, end_date: string, label: string) => {
+		let chartData = [];
+		let labels = [];
+		let datapoints = [];
+		const {data, error} = await supabaseDataService.getRPC(data_source,{start_date: '2022-10-01', end_date:'2022-10-31'});
+		if (error) {
+			console.error('getRPC error', error);
+		} else {
+			chartData = data;
+			labels = chartData.map((item) => item.date);
+			datapoints = chartData.map((item) => item.value);
+		}
+		datapoints = massageData(data_source, datapoints);
+		Chart.register(...registerables)
+		const ctx: any = document.getElementById('myChart')
+
+		const config: any = {
+			type: 'line',
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: label,
+						backgroundColor: 'rgb(255, 99, 132)',
+						borderColor: 'rgb(255, 99, 132)',
+						data: datapoints,
+					},
+				],
+			},
+			options: {
+				indexAxis: 'x',
+				scales: {
+					y: {
+						beginAtZero: false,
+					},
+				},
+				layout: {
+					padding: {
+						left: 10,
+						right: 50
+					},
+				},
+			},
+		}
+		if (my_chart) my_chart.destroy();
+		my_chart = new Chart(ctx, config)
+
+	}
+	const massageData = (data_source, datapoints) => {
+		// console.log('massageData', data_source, datapoints);
+		let output = [];
+		switch (data_source) {
+			case 'get_weights':
+				for (let i = 0; i < datapoints.length; i++) {
+					if (i === 0) output.push(datapoints[i])
+					else {
+						if (datapoints[i] === 0) {
+							output.push(output[i - 1])
+						} else {
+							output.push(datapoints[i])
+						}
+					}
+				}
+				break;
+			default:
+				output = [...datapoints];
+		}
+		// console.log('output', output);
+		return output;
+	}
+	function handleSegmentChange(e) {
+		chart_source = e.detail.value
+		switch (chart_source) {
+			case 'get_weights':
+				chart_label = 'Weight';
+				break
+			case 'get_calorie_totals':
+				chart_label = 'Calorie Totals';
+				break
+		}
+		createChart(chart_source, '2022-10-01', '2022-10-31', chart_label)
+	}
+
+</script>
+
+<ion-header translucent="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>Diet Tracker Charts</ion-title>
+		<!-- <ion-buttons slot="end">
+			<ion-button on:click={() => gotoWidget('new')}>
+				<ion-icon slot="icon-only" icon={addOutline} />
+			</ion-button>				
+		</ion-buttons> -->
+	</ion-toolbar>
+</ion-header>
+
+<IonPage {ionViewDidEnter}>
+	<ion-content class="ion-padding">
+		<div class="grid500 center">
+			Diet Tracker Charts... <br /><br />
+		</div>
+		{#if $currentUser}
+			<div class="segment">
+				<ion-segment value={chart_source} on:ionChange={handleSegmentChange}>
+					<ion-segment-button value="get_weights">
+						<ion-label>Weight</ion-label>
+					</ion-segment-button>
+					<ion-segment-button value="get_calorie_totals">
+						<ion-label>Calorie Totals</ion-label>
+					</ion-segment-button>
+				</ion-segment>
+			</div>
+			<canvas id="myChart" width="400" height="400" />	
+		{:else}
+			<div class="grid500 center">not logged in</div>
+		{/if}
+
+		<!-- currentUser: {JSON.stringify($currentUser)} -->
+	</ion-content>
+</IonPage>
+
+<style>
+	.center {
+		margin: auto;
+		width: 50%;
+		/* border: 3px solid green; */
+		padding: 10px;
+	}
+	.grid500 {
+		max-width: 500px;
+	}
+</style>
