@@ -9,8 +9,14 @@
 	let chart_source = 'get_weights';
 	let chart_label = 'Weight';
 	let my_chart: any;
-	let start_date = '2022-10-01';
-	let end_date = '2022-10-31';
+	// get the date one month ago
+	let today = new Date();
+	let one_month_ago = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate() - 1);
+	let start_date = one_month_ago.toISOString().split('T')[0];
+	// get yesterday's date
+	let yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+	let end_date = yesterday.toISOString().split('T')[0];
+	
 	let dateChooserItem = 'start_date';
 	const ionViewDidEnter = async () => {
 		createChart(chart_source, start_date, end_date, chart_label)
