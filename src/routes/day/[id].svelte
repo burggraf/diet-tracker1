@@ -167,7 +167,7 @@
 		} else {
 			id = day.id
 			// mode = 'view'
-			supabaseDataService.updateDataSubscription('day', { id })
+			// supabaseDataService.updateDataSubscription('day', { id })
 		}
 	}
 	const delete_day = async () => {
