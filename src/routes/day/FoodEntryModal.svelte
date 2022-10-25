@@ -7,7 +7,6 @@
     // read food data from json file
     export let entry: any = {};  
     export let isNew: boolean;
-    console.log('entry', entry)
     import {
       mailOutline,
       closeOutline,
@@ -47,7 +46,6 @@
         }
     }
 	function focusOnNumericInput(event) {
-		// console.log('event.target.scrollTop', event.target.scrollTop)
 		try {
 			if ((parseFloat(event.target.value!) || 0) === 0) {
 				event.target.value = ''
@@ -65,10 +63,7 @@
         modalController.dismiss({ data: entry });
     }
     async function search() {
-        console.log('search')
         const result = await openFoodSearchBox();
-        console.log('result', result)
-        // showModal = true;
     }
 
     const openFoodSearchBox = async () => {
@@ -84,12 +79,11 @@
 		await openFoodSearchModalController.present()
 		const { data } = await openFoodSearchModalController.onWillDismiss();
 		if (data?.data !== null) {	
-            console.log('got data', data.data)
-            entry.title = data.data.title;
-            entry.cps = data.data.calories;
+            entry.title = data.data.title || "";
+            entry.cps = data.data.calories || 0;
             entry.qty = 1.0;
             entry.amt = entry.cps * entry.qty;
-            entry.desc = data.data.portion;
+            entry.desc = data.data.portion || "";
 			return true;
 		} else {
 			return false;

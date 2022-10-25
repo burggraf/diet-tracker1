@@ -79,7 +79,6 @@ export default class SupabaseDataService {
 
      * 
      */
-    console.log('loadFunction: ' + `load_${item}`);
     const loadFunction: Function = this[`load_${item}`];
     if (!loadFunction) {
       console.error('supabaseDataService: missing function load_' + item);
@@ -139,11 +138,8 @@ export default class SupabaseDataService {
       const queue = JSON.parse(localStorage.getItem('update-queue') || '[]');
       if (queue.length > 0) {
         const { functionName, table, record, timestamp } = queue.shift();
-        // console.log('processQueue:', functionName, table, record, `timestamp: ${timestamp}`);
         if (functionName === 'saveRecord' || functionName === 'deleteRecord') {
           const { status, data, error } = await this.checkRecordVersion(table, record);
-          // console.log('processQueue: checkRecordVersion:', 'table', table, 'record', record);
-          console.log(`function: ${functionName}:`, 'status', status, 'data', data, 'error', error);
           if (status === 'conflict') {
             console.log('conflict detected');
             console.log('queued record:',record);
@@ -162,7 +158,6 @@ export default class SupabaseDataService {
           this.processQueue();
         }
       } else {
-        console.log('processQueue: queue is empty');
         queueProcssingActive = false;
       }
     }
@@ -223,11 +218,9 @@ export default class SupabaseDataService {
 
   public async saveRecord(table: string, record: any) {
     if (isOnline) {
-      console.log('saveRecord', table, record);
       const { data, error } = 
       await supabase.from(table)
       .upsert(record);
-      console.log('data', data, 'error', error);
       return { data, error };  
     } else {
       this.queueUpdate('saveRecord', table, record);
@@ -293,13 +286,11 @@ export default class SupabaseDataService {
   }
 
   public load_days = async (options: any = {}) => {
-    console.log('load_days: options', options);
     let loader;
     if (!options.cached) loader = await loadingBox('loading days...')
     if (!this.isConnected()) { await this.connect() }
     const { data, error } = await supabase.from('days').select().order('date',{ ascending: false }).limit(31);
     if (!options.cached) loader.dismiss();
-    console.log('load_days: data, error', data, error);
     return { data, error };
   }
 
@@ -409,18 +400,15 @@ export default class SupabaseDataService {
 
   public async getSettings(uid: string) {
     if (!this.isConnected()) { await this.connect() }
-    console.log('### supabaseDataService.getSettings, uid:', uid);
     const { data, error } = 
     await supabase.from('settings')
     .select('*')
     .eq('user_id', uid)
     .limit(1)
     .single(); // return a single object (not an array)
-    console.log('result-> supabaseDataService.getSettings, data:', data, error);
     return { data, error };  
   }
   public async saveSettings(settings: any) {
-    console.log('** saveSettings', settings);
     const { data, error} = await supabase.from('settings').upsert(settings);
     return { data, error };
   }
@@ -440,8 +428,6 @@ export default class SupabaseDataService {
     });
     if (error) {
       console.error('updateUserSetting error', error)
-    } else {
-      console.log('updateUserSetting result (user):', user);
     }
     return { user, error };
   }
@@ -465,8 +451,6 @@ export default class SupabaseDataService {
     try {
       const response = await fetch(url);
       const json = await response.json();
-      console.log('response', response);
-      console.log('json', json);
       if (!response.ok) {
         console.error('** fetch ERROR **', response.statusText);
         error = response.statusText;
@@ -476,7 +460,6 @@ export default class SupabaseDataService {
         json.products = [json.product];
       }
       if (json && json.products) {
-        // console.log('json', json);
         for (let i = 0; i < json.products.length; i++) {
           const product = json.products[i];     
           let desc = product.serving_size || '';
@@ -512,7 +495,7 @@ const supabaseDataService = SupabaseDataService.getInstance()
 networkService.online.subscribe((online: boolean) => {
   isOnline = online
   if (isOnline) {
-    console.log('supabase: app came online -- process pending queue')
+    // console.log('supabase: app came online -- process pending queue')
     if (!queueProcssingActive) {
       queueProcssingActive = true;
       supabaseDataService.processQueue();

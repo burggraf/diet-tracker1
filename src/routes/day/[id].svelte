@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { IonReorderGroup } from '@ionic/core/components/ion-reorder-group';
 	import IonPage from '$ionic/svelte/components/IonPage.svelte'
 	import { params, goto } from '@roxi/routify'
 	import { toast } from '$services/toast'
@@ -27,12 +28,10 @@
 	// let mode = 'view'
 
 	let day: any = {} // = cache || {}
-	console.log('*** id', id)
 	let recordset: any
 
 	const init = async () => {
 		if (id === 'new') {
-			console.log('it is new')
 			day = {
 					id: supabaseDataService.gen_random_uuid(),
 					user_id: $currentUser?.id || null,
@@ -53,9 +52,8 @@
 			)
 			if (data && data.id) {
 				const { data, error } = await supabaseDataService.getNextFreeDay()
-				console.log('getNextFreeDay', data, error)
 				if (error) {
-					console.log('getNextFreeDay error', error)
+					console.error('getNextFreeDay error', error)
 				} else {
 					id = data;
 					day = {
@@ -91,14 +89,12 @@
 		} else {
 			recordset = supabaseDataService.getDataSubscription('day', { id }).subscribe((rec) => {
 				day = rec
-				console.log('*** day', day)
 			})
 		}
 	}
 	init();
 
 	onMount(async () => {
-		// console.log('day onMount, $currentUser', $currentUser)
 		if (!$currentUser) {
 			$goto('/info')
 			return
@@ -113,7 +109,7 @@
 					day.weight = data.weight
 				}
 			} catch (ex) {
-				console.log('exception', ex)
+				console.error('exception', ex)
 				day.weight = 0
 			}
 		}
@@ -145,26 +141,21 @@
 	}
 	const save = async () => {
 		// validate here...
-		// console.log('save the day', day)
-		// console.log('id is currently', id)
-
 		if (!day.user_id) {
 			day.user_id = $currentUser.id
 		}
 		try {
 			day.food_total = 0
 			day.food_log.entries.forEach((entry) => {
-				day.food_total += entry.amt
+				day.food_total += (entry?.amt || 0)
 			})
 		} catch (err) {
 			console.error('error calculating food total', err)
 		}
-
 		const { error } = await supabaseDataService.save_day(day)
 		if (error) {
-			console.log('error message is: ', error.message)
+			console.error('save_day error', error.message)
 			if (error.message.startsWith('duplicate key value violates unique constraint')) {
-				console.log('DUPLICATE DAY')
 				alert({
 					header: 'Duplicate Day',
 					//subHeader: '',
@@ -176,7 +167,7 @@
 		} else {
 			id = day.id
 			// mode = 'view'
-			// supabaseDataService.updateDataSubscription('day', { id })
+			supabaseDataService.updateDataSubscription('day', { id })
 		}
 	}
 	const delete_day = async () => {
@@ -214,33 +205,30 @@
 		}
 
 		const saved = await openFoodEntryBox(entry, day.food_log.entries.length, true)
-		console.log('done calling openFoodEntryBox', saved)
-		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
 		save()
 	}
 	const edit_food_log_entry = async (index) => {
 		const saved = await openFoodEntryBox(day.food_log.entries[index], index, false)
-		console.log('edit_food_log_entry is done calling openFoodEntryBox', saved)
-		console.log('day.food_log.entries', day.food_log.entries)
 		day.food_log.entries = [...day.food_log.entries]
 		save()
 	}
 
 	const reorder_food_log = ({ detail }) => {
+		// const el: any = document.getElementById('food_log_group');
 		const { from, to } = detail
 		const item = day.food_log.entries.splice(from, 1)[0]
 		day.food_log.entries.splice(to, 0, item)
-		detail.complete()
-		console.log('reorder_food_log: day', day)
-		save()
+		const newItems = [...day.food_log.entries]
+		save();
+		detail.complete(newItems);
 	}
 
 	const openFoodEntryBox = async (entry: any, index: number, isNew: boolean) => {
 		const openFodEntryModalController = await modalController.create({
 			component: FoodEntryModal,
 			componentProps: {
-				entry: entry,
+				entry: entry || {},
 				isNew: isNew,
 			},
 			showBackdrop: true,
@@ -256,7 +244,6 @@
 			} else {
 				day.food_log.entries[index] = data.data
 			}
-			console.log('*** day.food_log.entries', day.food_log.entries)
 			return true
 		} else {
 			return false
@@ -287,7 +274,6 @@
 		}
 	}
 	function focusOnNumericInput(event) {
-		// console.log('event.target.scrollTop', event.target.scrollTop)
 		event.target.scrollTop = 0
 		try {
 			if ((parseFloat(event.target.value!) || 0) === 0) {
@@ -298,11 +284,9 @@
 		}
 	}
 	function saveOnBlur(event) {
-		console.log('*** saveOnBlur', event.target.value)
 		save()
 	}
 	function toggleDatePicker() {
-		console.log('** toggleDatePicker, id:', id)
 		const el = document.getElementById('datepicker')
 		if (id == 'new' || id.length === 10) {
 			if (el) {
@@ -342,32 +326,6 @@
 						<ion-icon slot="icon-only" icon={trashOutline} />
 					</ion-button>
 				{/if}
-				<!-- <ion-button
-						on:click={() => {
-							mode = 'edit'
-						}}
-					>
-						<ion-icon slot="icon-only" icon={createOutline} />
-					</ion-button> -->
-				<!-- {/if} -->
-				<!-- {#if mode === 'edit'}
-					<ion-button
-						on:click={() => {
-							mode = 'view'
-							if (id === 'add') goBack() // window.location.href = '/TestData';
-							// else day = cache || {}
-						}}
-					>
-						<ion-icon slot="icon-only" icon={closeOutline} />
-					</ion-button>
-					<ion-button
-						on:click={() => {
-							save()
-						}}
-					>
-						<ion-icon slot="icon-only" icon={checkmarkOutline} />
-					</ion-button>
-				{/if} -->
 			</ion-buttons>
 		</ion-toolbar>
 	</ion-header>
@@ -390,28 +348,35 @@
 			</ion-row>
 		</ion-grid>
 		<ion-list lines="full">
-			<ion-reorder-group id="food_log_group" disabled="false" on:ionItemReorder={reorder_food_log}>
-				{#if day?.food_log?.entries}
-					{#each day?.food_log?.entries as entry, index}
-						<ion-item
-							on:click={() => {
-								edit_food_log_entry(index)
-							}}
-						>
-							<ion-reorder slot="start" />
+			<ion-reorder-group id="food_log_group" disabled="false" 
+				on:ionItemReorder={
+					(evt) => {
+						evt.stopPropagation();
+						evt.preventDefault();
+						reorder_food_log(evt);
+						evt.stopPropagation();
+						evt.preventDefault();
+					}
+				}>
+				{#each (day?.food_log?.entries || []) as entry, index}
+					<ion-item
+						on:click={() => {
+							edit_food_log_entry(index)
+						}}
+					>
+						<ion-reorder slot="start" />
+						<div>
+							{entry?.title}<br />
+							<span class="description">{entry?.desc || ''}&nbsp;</span>
+						</div>
+						<ion-note slot="end" class="right">
 							<div>
-								{entry?.title}<br />
-								<span class="description">{entry?.desc || ''}&nbsp;</span>
+								{(entry?.amt || 0).toFixed(2)}<br />
+								<span class="description">&nbsp;{entry?.cat || ''}</span>
 							</div>
-							<ion-note slot="end" class="right">
-								<div>
-									{(entry?.amt || 0).toFixed(2)}<br />
-									<span class="description">&nbsp;{entry?.cat || ''}</span>
-								</div>
-							</ion-note>
-						</ion-item>
-					{/each}
-				{/if}
+						</ion-note>
+					</ion-item>
+				{/each}
 			</ion-reorder-group>
 
 			<ion-item lines="none" on:click={add_food_log_entry}>

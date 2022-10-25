@@ -36,7 +36,6 @@
 			user = newuser
 			if (user) {
 				currentUser.set(user)
-				console.log('MENU SET currentUser', user)
 			} else {
 				currentUser.set(null)
 			}
@@ -44,7 +43,6 @@
 		})
 		// const networkService = NetworkService.getInstance()
 		onlineSubscription = networkService.online.subscribe((online: boolean) => {
-			console.log('got online:', online)
 			onlineStatus = online
 		})
 	})
