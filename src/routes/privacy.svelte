@@ -48,8 +48,8 @@
 		</ul>
 		<p>
 			We are committed to conducting our business in accordance with these principles in order to
-			ensure that the confidentiality of personal information is protected and maintained. dMarie
-			Direct Inc may change this privacy policy from time to time at dMarie Direct Inc's sole
+			ensure that the confidentiality of personal information is protected and maintained. 
+			dMarie Direct Inc may change this privacy policy from time to time at dMarie Direct Inc's sole
 			discretion.
 		</p>
 	</div>
