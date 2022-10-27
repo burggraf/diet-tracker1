@@ -22,13 +22,20 @@ export default class UtilityFunctionsService {
     }
     public uuid_generate_v4 = this.gen_random_uuid;
   
+    // public getToday = () => {
+    //   const date = new Date();
+    //   return new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+    //                   .toISOString()
+    //                   .split("T")[0];
+    // }
     public getToday = () => {
       const date = new Date();
-      return new Date(date.getTime() - (date.getTimezoneOffset() * 60000 ))
+      return new Date(date.getTime())
                       .toISOString()
                       .split("T")[0];
     }
-  // public formatDate(date: string) {
+
+    // public formatDate(date: string) {
   //   if (!date) { return ''; }
   //   if (date.indexOf('T') > -1) {
   //     // date time
