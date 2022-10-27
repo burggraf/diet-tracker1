@@ -65,6 +65,14 @@
 		// window.location = page.url
 		menuController.close('mainmenu')
 	}
+	const toggleDebugger = () => {
+		const el = document.getElementById('debugger');
+		if (el.classList.contains('hidden')) {
+			el.classList.remove('hidden')
+		} else {
+			el.classList.add('hidden')
+		}
+	}
 </script>
 
 <ion-menu content-id="main" menu-id="mainmenu">
@@ -111,13 +119,13 @@
 		</ion-list>
 	</ion-content>
 	<ion-footer class="ion-padding">
-		<u
+		<div class="pointer centered" on:click={toggleDebugger}>v.{cfg?.version}</div>
+		<div id="debugger" class="hidden">			
+		<span class="pointer"
 			on:click={() => {
 				localStorage.clear()
-			}}>clear cache</u
-		><br />v.{cfg?.version}
-		<br />
-		<ion-item
+			}}>clear cache</span>
+		<span class="pointer span-on-right"
 			on:click={async (e) => {
 				await showConfirm({
 					header: 'Manually set online status',
@@ -135,17 +143,25 @@
 			<ion-label color={onlineStatus ? 'success' : 'danger'}
 				><b>{onlineStatus ? 'Online' : 'Offline'}</b></ion-label
 			>
-		</ion-item>
-		<!-- <div id="online-status">
-			<u>{onlineStatus ? "online" : "offline"}</u>
-		</div>
-		<br />&nbsp; -->
+		</span>
+	</div>
 	</ion-footer>
 </ion-menu>
 
 <style>
-	u {
+	.hidden {
+		display: none;
+	}
+	.pointer {
 		cursor: pointer;
+	}
+	.span-on-right{
+		text-align:right;
+		float:right;
+		padding-right:5px;
+	}
+	.centered {
+		text-align: center;
 	}
 	ion-item {
 		cursor: pointer;
