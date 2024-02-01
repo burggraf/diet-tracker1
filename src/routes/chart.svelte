@@ -4,7 +4,6 @@
 	import { Chart, registerables } from 'chart.js'
 
 	import SupabaseDataService from '$services/supabase.data.service'
-  import A from './[...fallback].svelte'
 	const supabaseDataService = SupabaseDataService.getInstance()	
 	let chart_source = 'get_weights';
 	let chart_label = 'Weight';
